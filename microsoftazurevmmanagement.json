@@ -15,6 +15,7 @@
     "package_name": "phantom_microsoftazurecompute",
     "main_module": "microsoftazurevmmanagement_connector.py",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud tested 2021-09-21"
     ],
