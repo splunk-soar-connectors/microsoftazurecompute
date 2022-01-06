@@ -30,9 +30,12 @@ VM_LIST_SNAPSHOTS_ENDPOINT = "{resourceValue}/providers/Microsoft.Compute/snapsh
 VM_RESOURCE_GROUP_VALUE_PART = "/resourceGroups/{resourceGroupName}"
 VM_SECURITY_GROUP_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/{groupType}{groupName}?api-version=2018-11-01"
 VM_LIST_VIRTUAL_NETWORKS_ENDPOINT = "{resourceGroup}/providers/Microsoft.Network/virtualNetworks?api-version=2018-11-01"
-VM_LIST_SUBNETS_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets?api-version=2018-11-01"
-VM_CHECK_IP_AVAIL = "/resourceGroups/{resourceGroup}/providers/Microsoft.Network/virtualNetworks/{virtualNetwork}/CheckIPAddressAvailability?ipAddress={ip}&api-version=2018-11-01"
-VM_RUN_COMMAND_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/runCommand?api-version=2017-03-30"
+VM_LIST_SUBNETS_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/\
+subnets?api-version=2018-11-01"
+VM_CHECK_IP_AVAIL = "/resourceGroups/{resourceGroup}/providers/Microsoft.Network/virtualNetworks/{virtualNetwork}/\
+CheckIPAddressAvailability?ipAddress={ip}&api-version=2018-11-01"
+VM_RUN_COMMAND_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/\
+runCommand?api-version=2017-03-30"
 
 TEST_CONNECTIVITY_FAILED_MSG = 'Test Connectivity Failed'
 MS_PHANTOM_SYS_INFO_URL = "{url}rest/system_info"
@@ -63,15 +66,19 @@ MS_OAUTH_URL_MSG = 'Using OAuth URL:'
 MS_AUTHORIZE_USER_MSG = 'Please authorize user in a separate tab using URL:'
 MS_GENERATING_ACCESS_TOKEN_MSG = 'Generating access token'
 MS_TC_STATUS_SLEEP = 3
-MS_REST_REQUEST_SCOPE = 'user_impersonation https://management.azure.com/user_impersonation offline_access group.readwrite.all user.readwrite.all'
+MS_REST_REQUEST_SCOPE = 'user_impersonation https://management.azure.com/user_impersonation \
+offline_access group.readwrite.all user.readwrite.all'
 MS_AZURE_CODE_GENERATION_SCOPE = 'https://management.azure.com/user_impersonation'
 
 MS_AZURE_UNKNOWN_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 MS_AZURE_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-MS_AZURE_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the Microsoft Azure Compute server. Please check the asset configuration and|or the action parameters."
-MS_AZURE_INVALID_PERMISSION_ERR = "Error occurred while saving the newly generated access token (in place of the expired token) in the state file."
+MS_AZURE_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the Microsoft Azure Compute server. \
+Please check the asset configuration and|or the action parameters."
+MS_AZURE_INVALID_PERMISSION_ERR = "Error occurred while saving the newly generated access token \
+(in place of the expired token) in the state file."
 MS_AZURE_INVALID_PERMISSION_ERR += " Please check the owner, owner group, and the permissions of the state file. The Phantom "
-MS_AZURE_INVALID_PERMISSION_ERR += "user should have the correct access rights and ownership for the corresponding state file (refer to readme file for more information)."
+MS_AZURE_INVALID_PERMISSION_ERR += "user should have the correct access rights and ownership for the corresponding state file \
+(refer to readme file for more information)."
 MS_AZURE_STATE_FILE_CORRUPT_ERROR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. \
 Please try again."
 MS_AZURE_ERR_MSG = "Status Code: {status_code}. Data from server: {err_msg}"
