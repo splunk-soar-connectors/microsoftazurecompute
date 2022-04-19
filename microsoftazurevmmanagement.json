@@ -19,7 +19,7 @@
     "latest_tested_versions": [
         "Cloud tested 2021-09-21"
     ],
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.2.0",
     "app_wizard_version": "1.0.0",
     "rest_handler": "microsoftazurevmmanagement_connector._handle_rest_request",
     "configuration": {
