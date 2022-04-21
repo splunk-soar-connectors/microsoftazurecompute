@@ -1,27 +1,37 @@
 # File: microsoftazurevmmanagement_connector.py
-# Copyright (c) 2019-2021 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-
-
+# Copyright (c) 2019-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-
-from django.http import HttpResponse
-from microsoftazurevmmanagement_consts import *
-from bs4 import BeautifulSoup
-
-import requests
-import json
-import time
-import pwd
 import grp
-import os
-import sys
-import re
 import ipaddress
+import json
+import os
+import pwd
+import re
+import sys
+import time
+
+import phantom.app as phantom
+import requests
+from bs4 import BeautifulSoup
+from django.http import HttpResponse
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+from microsoftazurevmmanagement_consts import *
 
 
 def _handle_login_redirect(request, key):
@@ -337,8 +347,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             resp_msg = resp_json.get('error', {}).get('message')
             if resp_code and resp_msg:
                 message = "{0}. {1}. Response code from server: {2}".format(MS_AZURE_SERVER_ERR_MSG,
-                                                                            MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_msg),
-                                                                            resp_code)
+                    MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_msg), resp_code)
             elif resp_msg:
                 message = "{0}. {1}".format(MS_AZURE_SERVER_ERR_MSG, MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_msg))
         elif resp_json.get('error'):
@@ -639,7 +648,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                         resp_json = res.json()
                     except Exception as e:
                         error_msg = self._get_error_message_from_exception(e)
-                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
+                            error_msg)), resp_json, None
                     if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
                         ret_val = self._get_token(action_result)
                         if phantom.is_fail(ret_val):
@@ -651,7 +661,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     r = request_func(location_url, headers=headers, verify=verify)
                 except Exception as e:
                     error_msg = self._get_error_message_from_exception(e)
-                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
+                        error_msg)), resp_json, None
                 if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
                     ret_val = self._get_token(action_result)
                     if phantom.is_fail(ret_val):
@@ -661,7 +672,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                         r = request_func(location_url, headers=headers, verify=verify)
                     except Exception as e:
                         error_msg = self._get_error_message_from_exception(e)
-                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
+                            error_msg)), resp_json, None
                 ret_val, response = self._process_response(r, action_result)
                 return ret_val, response, location_url
         elif r.status_code == 200:
@@ -873,6 +885,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Get system info failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -901,6 +914,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List vms failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -956,6 +970,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, json=body, method='put')
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Snapshot vm failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -989,6 +1004,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="post")
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Start vm failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1019,6 +1035,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="post")
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Stop vm failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1049,6 +1066,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="post")
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Deallocate vm failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1076,6 +1094,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(VM_LIST_TAGS_ENDPOINT, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List tags failed.")
             return action_result.get_status()
 
         # Add the response into thetag
@@ -1118,6 +1137,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         # If not tag_value, then create tag_name
         if not tag_value:
+            self.save_progress("Tag value does not exist. Create tag name first.")
             ret_val, response = self.create_tag_name(action_result, tag_name)
 
             if phantom.is_fail(ret_val):
@@ -1126,6 +1146,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             # Add the response into the data section
             action_result.add_data(response)
         else:
+            self.save_progress("Tag value exist. Create a new name=value pair or update existing tag name.")
             # Check if you're creating a new name=value pair, or updating the value of an already existing tag name
             value = VM_CREATE_TAG_VALUE_PART.format(tagValue=tag_value)
             endpoint = VM_CREATE_TAG_ENDPOINT.format(tagName=tag_name, tagValue=value)
@@ -1178,6 +1199,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(VM_RESOURCE_GROUP_ENDPOINT, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List resource groups failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1218,6 +1240,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List snapshots failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1249,9 +1272,11 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         group_type = param.get('group_type')
 
         if group_type == 'network':
-            endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='networkSecurityGroups', groupName='')
+            endpoint = VM_SECURITY_GROUP_ENDPOINT.format(
+                resourceGroupName=resource_group_name, groupType='networkSecurityGroups', groupName='')
         elif group_type == 'application':
-            endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='applicationSecurityGroups', groupName='')
+            endpoint = VM_SECURITY_GROUP_ENDPOINT.format(
+                resourceGroupName=resource_group_name, groupType='applicationSecurityGroups', groupName='')
         else:
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_GROUP_TYPE_ERR_MSG)
 
@@ -1259,6 +1284,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List security groups failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1295,7 +1321,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         resource_guid = param.get('resource_guid')
         security_rules = param.get('security_rules')
 
-        endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='networkSecurityGroups', groupName='/{}'.format(group_name))
+        endpoint = VM_SECURITY_GROUP_ENDPOINT.format(
+            resourceGroupName=resource_group_name, groupType='networkSecurityGroups', groupName='/{}'.format(group_name))
         body = {
             "location": location,
             "properties": {},
@@ -1308,6 +1335,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Load input tags failed, {0}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
         if default_security_rules:
             body['properties'].update({'defaultSecurityRules': default_security_rules})
@@ -1325,6 +1353,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Add network security group failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1355,7 +1384,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         location = param.get('location')
         tags = param.get('tags')
 
-        endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='applicationSecurityGroups', groupName='/{}'.format(group_name))
+        endpoint = VM_SECURITY_GROUP_ENDPOINT.format(
+            resourceGroupName=resource_group_name, groupType='applicationSecurityGroups', groupName='/{}'.format(group_name))
         body = {
             "location": location,
             "tags": {}
@@ -1367,12 +1397,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Load input tags failed, {0}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Add application security group failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1409,6 +1441,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List virtual networks failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1444,6 +1477,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("List subnets failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1479,6 +1513,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='delete')
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Delete vm failed")
             return action_result.get_status()
 
         # Add a dictionary that is made up of the most important values from data into the summary
@@ -1510,6 +1545,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Check address availability failed for IP: {0}.".format(ip_address))
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1551,6 +1587,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             summary['status'] = "Virtual machine must be powered off. Please power off the vm before generalizing it."
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Generalize vm failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1591,6 +1628,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             summary['status'] = "Resource group could not be found"
 
         if phantom.is_fail(ret_val):
+            self.debug_print("Redeploy vm failed.")
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1760,7 +1798,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 data['code'] = self._state.get('code')
                 data['grant_type'] = 'authorization_code'
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Unexpected details retrieved from the state file. Please run test connectivity first")
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Unexpected details retrieved from the state file. Please run test connectivity first")
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
 
@@ -1783,7 +1822,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         #
         # If the corresponding state file doesn't have correct owner, owner group or permissions,
         # the newly generated token is not being saved to state file and automatic workflow for token has been stopped.
-        # So we have to check that token from response and token which are saved to state file after successful generation of new token are same or not.
+        # So we have to check that token from response and token which are saved to state file
+        # after successful generation of new token are same or not.
 
         if self._access_token != self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING):
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_PERMISSION_ERR)
@@ -1796,10 +1836,13 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._get_token(action_result)
+
         if phantom.is_fail(ret_val):
+            self.debug_print("Generate token failed.")
             return action_result.get_status()
 
         self._state['admin_consent'] = True
@@ -1940,8 +1983,9 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
     pudb.set_trace()
 
     argparser = argparse.ArgumentParser()
@@ -1949,30 +1993,35 @@ if __name__ == '__main__':
     argparser.add_argument('input_test_json', help='Input Test JSON file')
     argparser.add_argument('-u', '--username', help='username', required=False)
     argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
 
-    if (args.username and args.password):
+    username = args.username
+    password = args.password
+    verify = args.verify
+
+    if (username and password):
         try:
             login_url = BaseConnector._get_phantom_base_url() + 'login'
             print("Accessing the Login page")
-            r = requests.get(login_url, verify=False)
+            r = requests.get(login_url, verify=verify, timeout=MS_AZURE_TIMEOUT)
             csrftoken = r.cookies['csrftoken']
-            data = {'username': args.username, 'password': args.password, 'csrfmiddlewaretoken': csrftoken}
+            data = {'username': username, 'password': password, 'csrfmiddlewaretoken': csrftoken}
             headers = {'Cookie': 'csrftoken={0}'.format(csrftoken), 'Referer': login_url}
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=MS_AZURE_TIMEOUT)
             session_id = r2.cookies['sessionid']
 
         except Exception as e:
             print("Unable to get session id from the platform. Error: {0}".format(str(e)))
-            exit(1)
+            sys.exit(1)
 
     if (len(sys.argv) < 2):
         print("No test json specified as input")
-        exit(0)
+        sys.exit(0)
 
     with open(sys.argv[1]) as f:
         in_json = f.read()
@@ -1988,4 +2037,4 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)

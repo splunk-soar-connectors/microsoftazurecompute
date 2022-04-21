@@ -9,16 +9,17 @@
     "product_name": "Azure Compute",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.1.0",
-    "utctime_updated": "2021-08-06T12:17:02.000000Z",
+    "license": "Copyright (c) 2019-2022 Splunk Inc.",
+    "app_version": "2.1.2",
+    "utctime_updated": "2022-01-07T20:56:33.000000Z",
     "package_name": "phantom_microsoftazurecompute",
     "main_module": "microsoftazurevmmanagement_connector.py",
     "python_version": "3",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud tested 2021-09-21"
     ],
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.2.0",
     "app_wizard_version": "1.0.0",
     "rest_handler": "microsoftazurevmmanagement_connector._handle_rest_request",
     "configuration": {
@@ -3719,7 +3720,7 @@
                 "command_id": {
                     "description": "The command to run against the VM",
                     "contains": [
-                      "vm management command id"
+                        "vm management command id"
                     ],
                     "data_type": "string",
                     "required": true,
@@ -3731,9 +3732,9 @@
                     "order": 3
                 },
                 "script_parameters": {
-                  "description": "The run command parameters",
-                  "data_type": "string",
-                  "order": 4
+                    "description": "The run command parameters",
+                    "data_type": "string",
+                    "order": 4
                 }
             },
             "output": [
@@ -3765,10 +3766,10 @@
                     "data_path": "action_result.parameter.command_id",
                     "data_type": "string",
                     "contains": [
-                      "vm management command id"
+                        "vm management command id"
                     ],
                     "example_values": [
-                      "RunShellScript"
+                        "RunShellScript"
                     ],
                     "column_name": "Command Id",
                     "column_order": 3
@@ -3777,7 +3778,7 @@
                     "data_path": "action_result.parameter.script",
                     "data_type": "string",
                     "example_values": [
-                      "echo $arg1 $arg2"
+                        "echo $arg1 $arg2"
                     ],
                     "column_name": "Script",
                     "column_order": 4
@@ -3786,7 +3787,7 @@
                     "data_path": "action_result.parameter.script_parameters",
                     "data_type": "string",
                     "example_values": [
-                      "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
+                        "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
                     ],
                     "column_name": "Parameters",
                     "column_order": 5
@@ -3804,24 +3805,24 @@
                         "vm management results url"
                     ],
                     "example_values": [
-                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                        "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
                     ]
                 },
                 {
                     "data_path": "action_result.data.results.*.code",
                     "data_type": "string",
                     "example_values": [
-                      "ComponentStatus/StdOut/succeeded",
-                      "ComponentStatus/StdErr/succeeded"
+                        "ComponentStatus/StdOut/succeeded",
+                        "ComponentStatus/StdErr/succeeded"
                     ]
                 },
                 {
                     "data_path": "action_result.data.results.*.level",
                     "data_type": "string",
                     "example_values": [
-                      "Info",
-                      "Error",
-                      "Warning"
+                        "Info",
+                        "Error",
+                        "Warning"
                     ]
                 },
                 {
@@ -3832,7 +3833,7 @@
                     "data_path": "action_result.data.*.displayStatus",
                     "data_type": "string",
                     "example_values": [
-                      "Provisioning succeeded"
+                        "Provisioning succeeded"
                     ]
                 },
                 {
@@ -3903,10 +3904,10 @@
                     "data_path": "action_result.parameter.results_url",
                     "data_type": "string",
                     "example_values": [
-                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                        "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
                     ],
                     "contains": [
-                      "vm management results url"
+                        "vm management results url"
                     ],
                     "column_name": "Results URL",
                     "column_order": 1
@@ -3919,22 +3920,22 @@
                     "data_path": "action_result.data.results_url",
                     "data_type": "string",
                     "example_values": [
-                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                        "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
                     ]
                 },
                 {
                     "data_path": "action_result.data.results.*.code",
                     "data_type": "string",
                     "example_values": [
-                      "ComponentStatus/StdOut/succeeded",
-                      "ComponentStatus/StdErr/succeeded"
+                        "ComponentStatus/StdOut/succeeded",
+                        "ComponentStatus/StdErr/succeeded"
                     ]
                 },
                 {
                     "data_path": "action_result.data.results.*.level",
                     "data_type": "string",
                     "example_values": [
-                      "Info"
+                        "Info"
                     ]
                 },
                 {
@@ -3945,7 +3946,7 @@
                     "data_path": "action_result.data.*.displayStatus",
                     "data_type": "string",
                     "example_values": [
-                      "Provisioning succeeded"
+                        "Provisioning succeeded"
                     ]
                 },
                 {
@@ -3992,5 +3993,105 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "Django",
+                "input_file": "wheels/py3/Django-3.2.13-py3-none-any.whl"
+            },
+            {
+                "module": "asgiref",
+                "input_file": "wheels/py3/asgiref-3.4.1-py3-none-any.whl"
+            },
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pytz",
+                "input_file": "wheels/shared/pytz-2022.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
+            },
+            {
+                "module": "sqlparse",
+                "input_file": "wheels/py3/sqlparse-0.4.2-py3-none-any.whl"
+            },
+            {
+                "module": "typing_extensions",
+                "input_file": "wheels/py3/typing_extensions-4.1.1-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip39_dependencies": {
+        "wheel": [
+            {
+                "module": "Django",
+                "input_file": "wheels/py3/Django-3.2.13-py3-none-any.whl"
+            },
+            {
+                "module": "asgiref",
+                "input_file": "wheels/py3/asgiref-3.5.0-py3-none-any.whl"
+            },
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/py3/beautifulsoup4-4.9.1-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/shared/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/shared/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pytz",
+                "input_file": "wheels/shared/pytz-2022.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/shared/requests-2.25.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/py3/soupsieve-2.3.2.post1-py3-none-any.whl"
+            },
+            {
+                "module": "sqlparse",
+                "input_file": "wheels/py3/sqlparse-0.4.2-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
+            }
+        ]
+    }
 }
