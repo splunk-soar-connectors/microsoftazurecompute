@@ -209,6 +209,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -274,6 +275,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  optional  | Name of the resource group | string |  `vm management resource group` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -337,6 +339,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **create\_option** |  required  | Source for disk's creation | string | 
 **source\_resource\_id** |  optional  | If create\_option is Copy, this is the ARM ID of the source snapshot or disk | string | 
 **source\_uri** |  optional  | If create\_option is Import, this is the URI of a blob to be imported into a managed disk | string | 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -379,6 +382,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -403,6 +407,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -427,6 +432,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -451,6 +457,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -471,7 +478,9 @@ Type: **investigate**
 Read only: **True**
 
 #### Action Parameters
-No parameters are required for this action
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -501,6 +510,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **tag\_name** |  required  | The name of the tag | string |  `vm management tag name` 
 **tag\_value** |  optional  | The value of the tag to create or update | string | 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -525,7 +535,10 @@ Type: **investigate**
 Read only: **True**
 
 #### Action Parameters
-No parameters are required for this action
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
+
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -552,6 +565,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  optional  | The name of the resource group | string |  `vm management resource group` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -592,6 +606,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **group\_type** |  required  | Type of security group to query | string | 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -659,6 +674,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **provisioning\_state** |  optional  | The provisioning state of the public IP resource | string | 
 **resource\_guid** |  optional  | The resource GUID property of the network security group resource | string | 
 **security\_rules** |  optional  | Comma separated list of security rules of the network security group | string | 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -712,6 +728,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **group\_name** |  required  | Name of security group to add | string |  `vm management group name` 
 **location** |  required  | Resource location | string | 
 **tags** |  optional  | String object of resource tags\. It should be in JSON format | string | 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -743,6 +760,7 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  optional  | The name of the resource group | string |  `vm management resource group` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -783,6 +801,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **virtual\_network\_name** |  required  | The name of the virtual network | string |  `vm management virtual network` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -814,6 +833,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **virtual\_network\_name** |  required  | The name of the virtual network | string |  `vm management virtual network` 
 **ip\_address** |  required  | The private IP address to be verified | string |  `ip`  `ipv6` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -840,6 +860,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -864,6 +885,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -893,6 +915,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **command\_id** |  required  | The command to run against the VM | string |  `vm management command id` 
 **script** |  optional  | The script to be executed\. When this value is given, the given script will override the default script of the command | string | 
 **script\_parameters** |  optional  | The run command parameters | string | 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -926,6 +949,7 @@ Commands in Azure can take up to 90 minutes to execute\. This allows you to retr
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **results\_url** |  required  | The name of the resource group | string |  `vm management results url` 
+**subscription\_id** | optional | ID of the Subscription the resource resides in, if different than the value provided in the asset configuration. | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
