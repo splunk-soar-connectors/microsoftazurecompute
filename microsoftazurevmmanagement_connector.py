@@ -1861,7 +1861,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
+        subscription_id = param.get("subscription_id", None)
+        if subscription_id:
+            self._subscription = subscription_id
+
         self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("subscription_id", self._subscription)
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
