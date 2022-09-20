@@ -23,7 +23,9 @@ import pwd
 import re
 import sys
 import time
+import traceback
 
+import encryption_helper
 import phantom.app as phantom
 import requests
 from bs4 import BeautifulSoup
@@ -44,13 +46,15 @@ def _handle_login_redirect(request, key):
 
     asset_id = request.GET.get('asset_id')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL', content_type="text/plain", status=400)
+        return HttpResponse('ERROR: Asset ID not found in URL', content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
     state = _load_app_state(asset_id)
     if not state:
-        return HttpResponse('ERROR: Invalid asset_id', content_type="text/plain", status=400)
+        return HttpResponse('ERROR: Invalid asset_id', content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
     url = state.get(key)
     if not url:
-        return HttpResponse('App state is invalid, {key} not found.'.format(key=key), content_type="text/plain", status=400)
+        return HttpResponse('App state is invalid, {key} not found.'.format(key=key),
+                            content_type="text/plain",
+                            status=MS_AZURE_BAD_REQUEST_CODE)
     response = HttpResponse(status=302)
     response['Location'] = url
     return response
@@ -88,7 +92,7 @@ def _load_app_state(asset_id, app_connector=None):
             app_connector.debug_print('In _load_app_state: Exception: {0}'.format(str(e)))
 
     if app_connector:
-        app_connector.debug_print('Loaded state: ', state)
+        app_connector.debug_print('Successfully load state file')
 
     return state
 
@@ -118,7 +122,7 @@ def _save_app_state(state, asset_id, app_connector):
         return {}
 
     if app_connector:
-        app_connector.debug_print('Saving state: ', state)
+        app_connector.debug_print('Successfully save state file')
 
     try:
         with open(real_state_file_path, 'w+') as state_file_obj:
@@ -138,7 +142,9 @@ def _handle_login_response(request):
 
     asset_id = request.GET.get('state')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
+        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)),
+                            content_type="text/plain",
+                            status=MS_AZURE_BAD_REQUEST_CODE)
 
     # Check for error in URL
     error = request.GET.get('error')
@@ -149,14 +155,16 @@ def _handle_login_response(request):
         message = 'Error: {0}'.format(error)
         if error_description:
             message = '{0} Details: {1}'.format(message, error_description)
-        return HttpResponse('Server returned {0}'.format(message), content_type="text/plain", status=400)
+        return HttpResponse('Server returned {0}'.format(message), content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
 
     code = request.GET.get('code')
     admin_consent = request.GET.get('admin_consent')
 
     # If none of the code or admin_consent is available
     if not (code or admin_consent):
-        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
+        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)),
+                            content_type="text/plain",
+                            status=MS_AZURE_BAD_REQUEST_CODE)
 
     state = _load_app_state(asset_id)
 
@@ -173,7 +181,9 @@ def _handle_login_response(request):
         # If admin_consent is True
         if admin_consent:
             return HttpResponse('Admin Consent received. Please close this window.', content_type="text/plain")
-        return HttpResponse('Admin Consent declined. Please close this window and try again later.', content_type="text/plain", status=400)
+        return HttpResponse('Admin Consent declined. Please close this window and try again later.',
+                            content_type="text/plain",
+                            status=MS_AZURE_BAD_REQUEST_CODE)
 
     # If value of admin_consent is not available, value of code is available
     state['code'] = code
@@ -191,7 +201,7 @@ def _handle_rest_request(request, path_parts):
     """
 
     if len(path_parts) < 2:
-        return HttpResponse('error: True, message: Invalid REST endpoint request', content_type="text/plain", status=400)
+        return HttpResponse('error: True, message: Invalid REST endpoint request', content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
 
     call_type = path_parts[1]
 
@@ -212,18 +222,18 @@ def _handle_rest_request(request, path_parts):
             auth_status_file_path = '{0}/{1}_{2}'.format(app_dir, asset_id, TC_FILE)
             real_auth_status_file_path = os.path.abspath(auth_status_file_path)
             if not os.path.dirname(real_auth_status_file_path) == app_dir:
-                return HttpResponse("Error: Invalid asset_id", content_type="text/plain", status=400)
+                return HttpResponse("Error: Invalid asset_id", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
             open(auth_status_file_path, 'w').close()
             try:
                 uid = pwd.getpwnam('apache').pw_uid
                 gid = grp.getgrnam('phantom').gr_gid
                 os.chown(auth_status_file_path, uid, gid)
                 os.chmod(auth_status_file_path, 0o600)
-            except:
+            except Exception:
                 pass
 
         return return_val
-    return HttpResponse('error: Invalid endpoint', content_type="text/plain", status=404)
+    return HttpResponse('error: Invalid endpoint', content_type="text/plain", status=MS_AZURE_NOT_FOUND_CODE)
 
 
 def _get_dir_name_from_app_name(app_name):
@@ -264,6 +274,86 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self._access_token = None
         self._refresh_token = None
 
+    def decrypt_state(self, state, salt):
+        """
+        Decrypts the state.
+
+        :param state: state dictionary
+        :param salt: salt used for decryption
+        :return: decrypted state
+        """
+        if not state.get("is_encrypted"):
+            return state
+
+        access_token = state.get("token", {}).get("access_token")
+        if access_token:
+            state["token"]["access_token"] = encryption_helper.decrypt(access_token, salt)
+
+        refresh_token = state.get("token", {}).get("refresh_token")
+        if refresh_token:
+            state["token"]["refresh_token"] = encryption_helper.decrypt(refresh_token, salt)
+
+        code = state.get("code")
+        if code:
+            state["code"] = encryption_helper.decrypt(code, salt)
+
+        return state
+
+    def encrypt_state(self, state, salt):
+        """
+        Encrypts the state.
+
+        :param state: state dictionary
+        :param salt: salt used for encryption
+        :return: encrypted state
+        """
+
+        access_token = state.get("token", {}).get("access_token")
+        if access_token:
+            state["token"]["access_token"] = encryption_helper.encrypt(access_token, salt)
+
+        refresh_token = state.get("token", {}).get("refresh_token")
+        if refresh_token:
+            state["token"]["refresh_token"] = encryption_helper.encrypt(refresh_token, salt)
+
+        code = state.get("code")
+        if code:
+            state["code"] = encryption_helper.encrypt(code, salt)
+
+        state["is_encrypted"] = True
+
+        return state
+
+    def load_state(self):
+        """
+        Load the contents of the state file to the state dictionary and decrypt it.
+
+        :return: loaded state
+        """
+        state = super().load_state()
+        try:
+            state = self.decrypt_state(state, self.get_asset_id())
+        except Exception as e:
+            self._dump_error_log(e, "Error while loading state file.")
+            state = None
+
+        return state
+
+    def save_state(self, state):
+        """
+        Encrypt and save the current state dictionary to the the state file.
+
+        :param state: state dictionary
+        :return: status
+        """
+        try:
+            state = self.encrypt_state(state, self.get_asset_id())
+        except Exception as e:
+            self._dump_error_log(e, "Error While saving state file.")
+            return phantom.APP_ERROR
+
+        return super().save_state(state)
+
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and returns True if address is valid IPv4 or IPV6 address.
 
@@ -273,10 +363,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         try:
             ipaddress.ip_address(input_ip_address)
-        except ValueError:
+        except ValueError as e:
+            self._dump_error_log(e, "Error while validating IP.")
             return False
 
         return True
+
+    def _dump_error_log(self, error, message="Exception occurred."):
+        self.error_print(message, dump_object=error)
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -286,7 +380,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code == 200 or response.status_code == 202:
+        if response.status_code == 200 or response.status_code == 202 or response.status_code == 204:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
@@ -305,18 +399,22 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:
+        except Exception as e:
+            self._dump_error_log(e, "Error while processing HTML response.")
             error_text = "Cannot parse error details"
 
         message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=error_text)
 
         message = message.replace('{', '{{').replace('}', '}}')
 
-        if status_code == 400:
+        if status_code == MS_AZURE_BAD_REQUEST_CODE:
             message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERROR)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -333,6 +431,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
+            self._dump_error_log(e, "Error while processing JSON response.")
             error_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
                                                    format(error_msg)), None)
@@ -407,6 +506,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
         error_msg = MS_AZURE_UNKNOWN_ERR_MSG
         error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
+        self.error_print("Traceback: {}".format(traceback.format_stack()))
         try:
             if e.args:
                 if len(e.args) > 1:
@@ -418,7 +518,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             else:
                 error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
                 error_msg = MS_AZURE_UNKNOWN_ERR_MSG
-        except:
+        except Exception as e:
+            self._dump_error_log(e, "Error while parsing error message.")
             error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
             error_msg = MS_AZURE_UNKNOWN_ERR_MSG
 
@@ -506,21 +607,26 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         try:
             request_func = getattr(requests, method)
-        except AttributeError:
+        except AttributeError as e:
+            self._dump_error_log(e, "Error while getting attribute from requests.")
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
         except requests.exceptions.InvalidSchema:
+            self._dump_error_log(e, "Error while REST call for InvalidSchema.")
             error_message = 'Error connecting to server. No connection adapters were found for {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.InvalidURL:
+            self._dump_error_log(e, "Error while REST call for InvalidURL.")
             error_message = 'Error connecting to server. Invalid URL {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
+            self._dump_error_log(e, "Error while REST call for ConnectionError.")
             error_message = 'Error Details: Connection Refused from the Server {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
+            self._dump_error_log(e, "Error while REST call.")
             error_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
                                                    .format(error_msg)), resp_json)
@@ -609,12 +715,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         try:
             request_func = getattr(requests, method)
-        except AttributeError:
+        except AttributeError as e:
+            self._dump_error_log(e, "Error while getting attribute from requests.")
             return action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json, None
 
         try:
             r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
+            self._dump_error_log(e, "Error while REST call.")
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
@@ -626,6 +734,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             try:
                 r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
             except Exception as e:
+                self._dump_error_log(e, "Error while REST call.")
                 error_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
@@ -647,6 +756,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                         res = request_func(operation_status, headers=headers, verify=verify)
                         resp_json = res.json()
                     except Exception as e:
+                        self._dump_error_log(e, "Error while REST call.")
                         error_msg = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                             error_msg)), resp_json, None
@@ -660,6 +770,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 try:
                     r = request_func(location_url, headers=headers, verify=verify)
                 except Exception as e:
+                    self._dump_error_log(e, "Error while REST call.")
                     error_msg = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                         error_msg)), resp_json, None
@@ -671,6 +782,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     try:
                         r = request_func(location_url, headers=headers, verify=verify)
                     except Exception as e:
+                        self._dump_error_log(e, "Error while REST call.")
                         error_msg = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                             error_msg)), resp_json, None
@@ -1334,6 +1446,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 sg_tags = json.loads(tags)
                 body['tags'].update(sg_tags)
         except Exception as e:
+            self._dump_error_log(e, "Error while deserialize tags parameter.")
             error_msg = self._get_error_message_from_exception(e)
             self.debug_print("Load input tags failed, {0}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
@@ -1347,7 +1460,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             if security_rules:
                 security_rules = json.loads(security_rules)
                 body['properties'].update({'securityRules': security_rules})
-        except:
+        except Exception as e:
+            self._dump_error_log(e, "Error while deserialize security_rules parameter.")
             body['properties'].update({'securityRules': security_rules})
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
@@ -1396,6 +1510,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 sg_tags = json.loads(tags)
                 body['tags'].update(sg_tags)
         except Exception as e:
+            self._dump_error_log(e, "Error while deserialize tags parameter.")
             error_msg = self._get_error_message_from_exception(e)
             self.debug_print("Load input tags failed, {0}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
@@ -1446,8 +1561,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         # Add the response into the data section
         values = response.get('value', [])
-        for s in values:
-            action_result.add_data(s)
+        for value in values:
+            action_result.add_data(value)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
@@ -1482,8 +1597,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         # Add the response into the data section
         values = response.get('value', [])
-        for s in values:
-            action_result.add_data(s)
+        for value in values:
+            action_result.add_data(value)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
@@ -1673,7 +1788,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if script_parameters:
             try:
                 script_param_json = json.loads(script_parameters)
-            except ValueError:
+            except ValueError as e:
+                self._dump_error_log(e, "Error while deserialize script_parameters parameter.")
                 return action_result.set_status(phantom.APP_ERROR, "'script_parameters' input is not a JSON dictionary")
             else:
                 if not isinstance(script_param_json, list):
@@ -1698,6 +1814,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     try:
                         message_json = json.loads(result.get('message'))
                     except Exception as e:
+                        self._dump_error_log(e, "Error while deserialize message parameter.")
                         err_msg = self._get_error_message_from_exception(e)
                         self.debug_print("No json data in results message: {}".format(err_msg))
                     else:
@@ -1731,7 +1848,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         pattern = re.compile(r'https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)')
         try:
             subscription_id, endpoint = re.search(pattern, results_url).groups()
-        except AttributeError:
+        except AttributeError as e:
+            self._dump_error_log(e, "Error while searching pattern in results_url parameter.")
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'results_url' action parameter")
 
         if subscription_id != self._subscription:
@@ -1751,6 +1869,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     try:
                         message_json = json.loads(result.get('message'))
                     except Exception as e:
+                        self._dump_error_log(e, "Error while deserialize message parameter.")
                         err_msg = self._get_error_message_from_exception(e)
                         self.debug_print("No json data in results message: {}".format(err_msg))
                     else:
@@ -1790,12 +1909,24 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             # add the resource that is to be accessed for the non-interactive OAuth
             data['resource'] = 'https://management.azure.com/'
         else:
-            if from_action or self._state.get('token', {}).get('refresh_token', None) is not None:
-                data['refresh_token'] = self._state.get('token').get('refresh_token')
+            self.refresh_token = self._state.get('token', {}).get('refresh_token', None)
+            if from_action or self.refresh_token is not None:
+                # if self._state.get(MS_AZURE_STATE_IS_ENCRYPTED):
+                #     if self.refresh_token:
+                #         try:
+                #             data['refresh_token'] = self.decrypt_state(self._access_token)
+                #         except Exception as e:
+                #             self._dump_error_log(e, "{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                #             self.refresh_token = None
+                data['refresh_token'] = self.refresh_token
                 data['grant_type'] = 'refresh_token'
-            elif self._state.get('code'):
-                data['redirect_uri'] = self._state.get('redirect_uri')
+            elif self._state.get('code', None) is not None:
+                # try:
+                #     data['code'] = self.decrypt_state(self._state.get('code'))
+                # except Exception as e:
+                #     self._dump_error_log(e, "{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
                 data['code'] = self._state.get('code')
+                data['redirect_uri'] = self._state.get('redirect_uri')
                 data['grant_type'] = 'authorization_code'
             else:
                 return action_result.set_status(phantom.APP_ERROR,
@@ -1806,27 +1937,16 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        try:
+            self._access_token = resp_json[MS_AZURE_ACCESS_TOKEN_STRING]
+            if MS_AZURE_REFRESH_TOKEN_STRING in resp_json:
+                self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
+        except Exception as e:
+            self._dump_error_log(e, "Error occurred while generating access token.")
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while generating access token {}".format(err))
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
-        self._access_token = resp_json.get(MS_AZURE_ACCESS_TOKEN_STRING)
-
-        if not self._admin_consent:
-            # refresh token is only received of interactive OAuth
-            self._refresh_token = resp_json.get(MS_AZURE_REFRESH_TOKEN_STRING)
-
-        self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
-
-        self._state = self.load_state()
-
-        # Scenario -
-        #
-        # If the corresponding state file doesn't have correct owner, owner group or permissions,
-        # the newly generated token is not being saved to state file and automatic workflow for token has been stopped.
-        # So we have to check that token from response and token which are saved to state file
-        # after successful generation of new token are same or not.
-
-        if self._access_token != self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING):
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_PERMISSION_ERR)
 
         return (phantom.APP_SUCCESS)
 
@@ -1965,7 +2085,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self._admin_access = config.get(MS_AZURE_CONFIG_ADMIN_ACCESS)
         self._admin_consent = config.get(MS_AZURE_CONFIG_ADMIN_CONSENT)
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
-        self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
 
         self.set_validator('ipv6', self._is_ip)
 

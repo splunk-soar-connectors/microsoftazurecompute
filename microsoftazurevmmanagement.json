@@ -4,8 +4,8 @@
     "description": "This app implements virtualization actions for Microsoft Azure Virtual Machines",
     "type": "virtualization",
     "product_vendor": "Microsoft",
-    "logo": "microsoftazurevmmanagement.svg",
-    "logo_dark": "microsoftazurevmmanagement_dark.svg",
+    "logo": "logo_microsoftazurevmmanagement.svg",
+    "logo_dark": "logo_microsoftazurevmmanagement_dark.svg",
     "product_name": "Azure Compute",
     "product_version_regex": ".*",
     "publisher": "Splunk",
@@ -19,12 +19,12 @@
     "latest_tested_versions": [
         "Cloud tested 2021-09-21"
     ],
-    "min_phantom_version": "5.2.0",
+    "min_phantom_version": "5.3.0",
     "app_wizard_version": "1.0.0",
     "contributors": [
-      {
-        "name": "import-au"
-      }
+        {
+            "name": "import-au"
+        }
     ],
     "rest_handler": "microsoftazurevmmanagement_connector._handle_rest_request",
     "configuration": {
@@ -86,10 +86,6 @@
             "parameters": {},
             "output": [
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -100,15 +96,19 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Token generated"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -160,12 +160,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -175,6 +181,10 @@
                     "example_values": [
                         "myResourceGroup1"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -504,12 +514,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -517,10 +523,6 @@
                     "example_values": [
                         "The system info was successfully retrieved"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -565,12 +567,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 1
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -580,6 +588,10 @@
                     "example_values": [
                         "myResourceGroup1"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -682,17 +694,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.ssh.publicKeys.*.path",
-                    "data_type": "string",
-                    "example_values": [
-                        "/home/azureuser/.ssh/authorized_keys"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.ssh.publicKeys.*.keyData",
                     "data_type": "string",
                     "example_values": [
                         "ssh-rsa sample_rsa_AAAbWxYa/Cw\r\nI3pXrnLZbh2obel1riER4uqamt1mbM+maPPxCCyBDyDIy31\r\nKTDYhRJ7j2vNbaa5Oyt6H8Zasypmpzth2jEwKDDi62EkQTyrNsm/CFkycMuflVZx\r\neVxXjIFG2ix0ENkSg1VXbAb6Nz0r+zBFXkOppdpSe/j+oqKihw7KjFLe0YtIwxiN\r\nFu0MHCBBvdSBmFtzrhkk3g7bnMqbD8JQdzKgkNW4xM9\r\nZRjXtwdsn7XOVcNsJ2K0e4u5xJfb6RmBQAh3IplVXX\r\nGOMl3d9S/AWmL2FLO/j9250ntbi2BsU+g0G6E\r\ncpC9JxMu5laUd/Cee2EhG+27U51nzE4O/eaVQwNAEKdYRYP9rocOisx\r\npeqy6TbUwnrrir/4y8woNYso+R4k= generated-by-azure\r\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.ssh.publicKeys.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/home/azureuser/.ssh/authorized_keys"
                     ]
                 },
                 {
@@ -843,11 +855,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_vms",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        2
                     ]
                 },
                 {
@@ -855,13 +866,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num vms: 2"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_vms",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
                     ]
                 },
                 {
@@ -970,12 +974,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 6
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.create_option",
                     "data_type": "string",
@@ -1016,6 +1026,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.source_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
                     "data_type": "string"
                 },
                 {
@@ -1121,21 +1135,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully created snapshot, Provisioning state: Updating"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.provisioning_state",
                     "data_type": "string",
                     "example_values": [
@@ -1147,6 +1146,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully created snapshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully created snapshot, Provisioning state: Updating"
                     ]
                 },
                 {
@@ -1204,12 +1210,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -1223,6 +1235,10 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.vm_name",
                     "data_type": "string",
                     "contains": [
@@ -1231,27 +1247,12 @@
                     "example_values": [
                         "testVM"
                     ],
-                    "column_name": "VM Name",
+                    "column_name": "Vm Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully started VM"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",
@@ -1261,6 +1262,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully started VM"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1313,12 +1321,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -1332,6 +1346,10 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.vm_name",
                     "data_type": "string",
                     "contains": [
@@ -1340,27 +1358,12 @@
                     "example_values": [
                         "testVM"
                     ],
-                    "column_name": "VM Name",
+                    "column_name": "Vm Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully stopped VM"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",
@@ -1370,6 +1373,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully stopped VM"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1421,12 +1431,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -1440,6 +1456,10 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.vm_name",
                     "data_type": "string",
                     "contains": [
@@ -1448,27 +1468,12 @@
                     "example_values": [
                         "test"
                     ],
-                    "column_name": "VM Name",
+                    "column_name": "Vm Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully deleted the vm"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",
@@ -1478,6 +1483,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully deleted the vm"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1529,12 +1541,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -1548,6 +1566,10 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.vm_name",
                     "data_type": "string",
                     "contains": [
@@ -1556,27 +1578,12 @@
                     "example_values": [
                         "testVM"
                     ],
-                    "column_name": "VM Name",
+                    "column_name": "Vm Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully deallocated VM"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",
@@ -1586,6 +1593,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully deallocated VM"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1617,12 +1631,22 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 0
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
                 {
                     "data_path": "action_result.data.*.count.type",
                     "data_type": "string",
@@ -1683,11 +1707,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_tags",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        6
                     ]
                 },
                 {
@@ -1695,13 +1718,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num tags: 6"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_tags",
-                    "data_type": "numeric",
-                    "example_values": [
-                        6
                     ]
                 },
                 {
@@ -1753,12 +1769,24 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
                 {
                     "data_path": "action_result.parameter.tag_name",
                     "data_type": "string",
@@ -1813,27 +1841,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "Successfully created tag"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully created tag"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully created tag"
                     ]
                 },
                 {
@@ -1866,12 +1884,22 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 0
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
@@ -1926,11 +1954,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_resource_groups",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        4
                     ]
                 },
                 {
@@ -1938,13 +1965,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num resource groups: 4"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_resource_groups",
-                    "data_type": "numeric",
-                    "example_values": [
-                        4
                     ]
                 },
                 {
@@ -1986,12 +2006,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 1
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -2001,6 +2027,10 @@
                     "example_values": [
                         "myResourceGroup1"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -2118,11 +2148,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_snapshots",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        3
                     ]
                 },
                 {
@@ -2130,13 +2159,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num snapshots: 3"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_snapshots",
-                    "data_type": "numeric",
-                    "example_values": [
-                        3
                     ]
                 },
                 {
@@ -2194,12 +2216,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.group_type",
                     "data_type": "string",
@@ -2221,6 +2249,10 @@
                     ],
                     "column_name": "Resource Group Name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -2381,17 +2413,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.properties.securityRules.*.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "/subscriptions/4c357906-2c22-4d91-98aa-180d9a85a370/resourceGroups/Phantom_Test/providers/Microsoft.Network/networkSecurityGroups/phantom.vm-3-nsg/securityRules/SSH"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.properties.securityRules.*.etag",
                     "data_type": "string",
                     "example_values": [
                         "W/\"1c2086b4-b285-41f2-8ce0-9898a57f60ad\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/4c357906-2c22-4d91-98aa-180d9a85a370/resourceGroups/Phantom_Test/providers/Microsoft.Network/networkSecurityGroups/phantom.vm-3-nsg/securityRules/SSH"
                     ]
                 },
                 {
@@ -2402,17 +2434,31 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.properties.securityRules.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "Microsoft.Network/networkSecurityGroups/securityRules"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.properties.securityRules.*.properties.access",
                     "data_type": "string",
                     "example_values": [
                         "Allow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.destinationAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.destinationPortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.direction",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inbound"
                     ]
                 },
                 {
@@ -2430,10 +2476,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.properties.securityRules.*.properties.direction",
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.sourceAddressPrefix",
                     "data_type": "string",
                     "example_values": [
-                        "Inbound"
+                        "*"
                     ]
                 },
                 {
@@ -2444,31 +2490,10 @@
                     ]
                 },
                 {
-                    "data_path": "ction_result.data.*.properties.securityRules.*.properties.provisioningState",
+                    "data_path": "action_result.data.*.properties.securityRules.*.type",
                     "data_type": "string",
                     "example_values": [
-                        "Succeeded"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.properties.securityRules.*.properties.sourceAddressPrefix",
-                    "data_type": "string",
-                    "example_values": [
-                        "*"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.properties.securityRules.*.properties.destinationPortRange",
-                    "data_type": "string",
-                    "example_values": [
-                        "22"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.properties.securityRules.*.properties.destinationAddressPrefix",
-                    "data_type": "string",
-                    "example_values": [
-                        "*"
+                        "Microsoft.Network/networkSecurityGroups/securityRules"
                     ]
                 },
                 {
@@ -2486,11 +2511,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_security_groups",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        1
                     ]
                 },
                 {
@@ -2498,13 +2522,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num security groups: 1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_security_groups",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -2623,12 +2640,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 8
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.default_security_rules",
                     "data_type": "string"
@@ -2677,6 +2700,10 @@
                     "example_values": [
                         "[{\"name\": \"rule1\", \"properties\": { \"protocol\": \"*\", \"sourceAddressPrefix\": \"*\", \"destinationAddressPrefix\": \"*\", \"access\": \"Allow\", \"destinationPortRange\": \"80\", \"sourcePortRange\": \"*\", \"priority\": 130, \"direction\": \"Inbound\" } }]"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.tags",
@@ -2844,11 +2871,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "Successfully added or updated security group"
                     ]
                 },
                 {
@@ -2856,13 +2882,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added or updated security group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully added or updated security group"
                     ]
                 },
                 {
@@ -2959,12 +2978,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 4
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
@@ -2991,6 +3016,10 @@
                     "example_values": [
                         "myResourceGroup1"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.tags",
@@ -3052,11 +3081,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "Successfully added or updated security group"
                     ]
                 },
                 {
@@ -3064,13 +3092,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added or updated security group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully added or updated security group"
                     ]
                 },
                 {
@@ -3116,12 +3137,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 1
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3131,6 +3158,10 @@
                     "example_values": [
                         "myResourceGroup1"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -3264,11 +3295,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_virtual_networks",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        3
                     ]
                 },
                 {
@@ -3276,13 +3306,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num virtual networks: 3"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_virtual_networks",
-                    "data_type": "numeric",
-                    "example_values": [
-                        3
                     ]
                 },
                 {
@@ -3339,12 +3362,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3356,6 +3385,10 @@
                     ],
                     "column_name": "Resource Group Name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.virtual_network_name",
@@ -3425,11 +3458,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_subnets",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        2
                     ]
                 },
                 {
@@ -3437,13 +3469,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Num subnets: 2"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_subnets",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
                     ]
                 },
                 {
@@ -3507,12 +3532,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 3
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
@@ -3537,6 +3568,10 @@
                     ],
                     "column_name": "Resource Group Name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.virtual_network_name",
@@ -3572,11 +3607,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.num_ips_available",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        5
                     ]
                 },
                 {
@@ -3584,13 +3618,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Available: False, Num ips available: 5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_ips_available",
-                    "data_type": "numeric",
-                    "example_values": [
-                        5
                     ]
                 },
                 {
@@ -3643,12 +3670,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3662,6 +3695,10 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.vm_name",
                     "data_type": "string",
                     "contains": [
@@ -3670,27 +3707,12 @@
                     "example_values": [
                         "abc"
                     ],
-                    "column_name": "VM Name",
+                    "column_name": "Vm Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully generalized the vm"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",
@@ -3700,6 +3722,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully generalized the vm"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3751,12 +3780,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 2
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3770,6 +3805,10 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.vm_name",
                     "data_type": "string",
                     "contains": [
@@ -3778,27 +3817,12 @@
                     "example_values": [
                         "virtualMachine1"
                     ],
-                    "column_name": "VM Name",
+                    "column_name": "Vm Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully redeployed the vm"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",
@@ -3808,6 +3832,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully redeployed the vm"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3864,7 +3895,8 @@
                     ],
                     "data_type": "string",
                     "required": true,
-                    "order": 2
+                    "order": 2,
+                    "primary": true
                 },
                 "script": {
                     "description": "The script to be executed. When this value is given, the given script will override the default script of the command",
@@ -3879,12 +3911,30 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 5
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.command_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management command id"
+                    ],
+                    "example_values": [
+                        "RunShellScript"
+                    ],
+                    "column_name": "Command ID",
+                    "column_order": 3
+                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3896,30 +3946,6 @@
                     ],
                     "column_name": "Resource Group Name",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.parameter.vm_name",
-                    "data_type": "string",
-                    "contains": [
-                        "vm management virtual machine"
-                    ],
-                    "example_values": [
-                        "sample_vm"
-                    ],
-                    "column_name": "VM Name",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.parameter.command_id",
-                    "data_type": "string",
-                    "contains": [
-                        "vm management command id"
-                    ],
-                    "example_values": [
-                        "RunShellScript"
-                    ],
-                    "column_name": "Command Id",
-                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.script",
@@ -3940,8 +3966,31 @@
                     "column_order": 5
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "sample_vm"
+                    ],
+                    "column_name": "Vm Name",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.displayStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Provisioning succeeded"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.results_url",
@@ -3977,28 +4026,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.displayStatus",
-                    "data_type": "string",
-                    "example_values": [
-                        "Provisioning succeeded"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully executed command"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
@@ -4006,6 +4033,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully executed command"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -4048,12 +4082,18 @@
                 "subscription_id": {
                     "description": "ID of the Subscription, if different than the Subscription provided in the asset",
                     "data_type": "string",
-                    "required": false,
-                    "primary": true,
                     "order": 1
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.results_url",
                     "data_type": "string",
@@ -4067,14 +4107,18 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.subscription_id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.results_url",
+                    "data_path": "action_result.data.*.displayStatus",
                     "data_type": "string",
                     "example_values": [
-                        "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                        "Provisioning succeeded"
                     ]
                 },
                 {
@@ -4097,25 +4141,10 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.displayStatus",
+                    "data_path": "action_result.data.results_url",
                     "data_type": "string",
                     "example_values": [
-                        "Provisioning succeeded"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully executed command"
+                        "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
                     ]
                 },
                 {
@@ -4126,6 +4155,13 @@
                     ],
                     "column_name": "Status",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully executed command"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -4164,7 +4200,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -4176,7 +4212,7 @@
             },
             {
                 "module": "pytz",
-                "input_file": "wheels/shared/pytz-2022.1-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/pytz-2022.2.1-py2.py3-none-any.whl"
             },
             {
                 "module": "requests",
@@ -4196,7 +4232,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     },
@@ -4208,7 +4244,7 @@
             },
             {
                 "module": "asgiref",
-                "input_file": "wheels/py3/asgiref-3.5.0-py3-none-any.whl"
+                "input_file": "wheels/py3/asgiref-3.5.2-py3-none-any.whl"
             },
             {
                 "module": "beautifulsoup4",
@@ -4216,7 +4252,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -4228,7 +4264,7 @@
             },
             {
                 "module": "pytz",
-                "input_file": "wheels/shared/pytz-2022.1-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/pytz-2022.2.1-py2.py3-none-any.whl"
             },
             {
                 "module": "requests",
@@ -4244,7 +4280,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.9-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     }

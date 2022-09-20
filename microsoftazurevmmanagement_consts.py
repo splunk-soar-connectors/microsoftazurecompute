@@ -44,18 +44,22 @@ MS_PHANTOM_ASSET_INFO_URL = "{url}rest/asset/{asset_id}"
 MS_AZURE_CONFIG_TENANT = 'tenant_id'
 MS_AZURE_CONFIG_SUBSCRIPTION = 'subscription_id'
 MS_AZURE_CONFIG_CLIENT_ID = 'client_id'
-MS_AZURE_CONFIG_CLIENT_SECRET = 'client_secret'
+MS_AZURE_CONFIG_CLIENT_SECRET = 'client_secret'  # pragma: allowlist secret
 MS_AZURE_CONFIG_ADMIN_ACCESS = 'admin_access'
 MS_AZURE_CONFIG_ADMIN_CONSENT = 'admin_consent'
 MS_AZURE_TOKEN_STRING = 'token'
 MS_AZURE_ACCESS_TOKEN_STRING = 'access_token'
 MS_AZURE_REFRESH_TOKEN_STRING = 'refresh_token'
+MS_AZURE_STATE_IS_ENCRYPTED = 'is_encrypted'
 MS_AZURE_PHANTOM_BASE_URL = '{phantom_base_url}rest'
 MS_AZURE_PHANTOM_SYS_INFO_URL = '/system_info'
 MS_AZURE_PHANTOM_ASSET_INFO_URL = '/asset/{asset_id}'
 MS_AZURE_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
                                 'Please specify this value in System Settings.'
 MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The request URL is invalid.'
+
+MS_AZURE_ENCRYPTION_ERROR = "Error occurred while encrypting the state file."
+MS_AZURE_DECRYPTION_ERROR = "Error occurred while decrypting the state file."
 
 # For authorization code
 TC_FILE = "oauth_task.out"
@@ -87,3 +91,5 @@ MS_AZURE_INVALID_JSON = "{err_msg}: Invalid format of body. Please provide valid
 MS_AZURE_GROUP_TYPE_ERR_MSG = "Please provide a valid value in the 'group_type' action parameter. Expected values are 'application' or 'network'"
 MS_AZURE_INVALID_TOKEN_MESSAGES = ['token is invalid', 'Access token has expired', 'ExpiredAuthenticationToken', 'AuthenticationFailed']
 MS_AZURE_TIMEOUT = 30
+MS_AZURE_BAD_REQUEST_CODE = 400
+MS_AZURE_NOT_FOUND_CODE = 404
