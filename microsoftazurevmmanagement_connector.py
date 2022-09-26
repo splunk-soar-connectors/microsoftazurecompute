@@ -23,7 +23,6 @@ import pwd
 import re
 import sys
 import time
-import traceback
 
 import encryption_helper
 import phantom.app as phantom
@@ -431,7 +430,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            self._dump_error_log(e, "Error while processing JSON response.")
             error_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
                                                    format(error_msg)), None)
@@ -506,7 +504,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
         error_msg = MS_AZURE_UNKNOWN_ERR_MSG
         error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
-        self.error_print("Traceback: {}".format(traceback.format_stack()))
+        self._dump_error_log(e, "Traceback: ")
         try:
             if e.args:
                 if len(e.args) > 1:
@@ -626,7 +624,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             error_message = 'Error Details: Connection Refused from the Server {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            self._dump_error_log(e, "Error while REST call.")
             error_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
                                                    .format(error_msg)), resp_json)
@@ -722,7 +719,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         try:
             r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
-            self._dump_error_log(e, "Error while REST call.")
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
@@ -734,7 +730,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             try:
                 r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
             except Exception as e:
-                self._dump_error_log(e, "Error while REST call.")
                 error_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
@@ -756,7 +751,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                         res = request_func(operation_status, headers=headers, verify=verify)
                         resp_json = res.json()
                     except Exception as e:
-                        self._dump_error_log(e, "Error while REST call.")
                         error_msg = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                             error_msg)), resp_json, None
@@ -770,7 +764,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 try:
                     r = request_func(location_url, headers=headers, verify=verify)
                 except Exception as e:
-                    self._dump_error_log(e, "Error while REST call.")
                     error_msg = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                         error_msg)), resp_json, None
@@ -782,7 +775,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     try:
                         r = request_func(location_url, headers=headers, verify=verify)
                     except Exception as e:
-                        self._dump_error_log(e, "Error while REST call.")
                         error_msg = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                             error_msg)), resp_json, None
@@ -1510,7 +1502,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 sg_tags = json.loads(tags)
                 body['tags'].update(sg_tags)
         except Exception as e:
-            self._dump_error_log(e, "Error while deserialize tags parameter.")
             error_msg = self._get_error_message_from_exception(e)
             self.debug_print("Load input tags failed, {0}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
@@ -1814,7 +1805,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     try:
                         message_json = json.loads(result.get('message'))
                     except Exception as e:
-                        self._dump_error_log(e, "Error while deserialize message parameter.")
                         err_msg = self._get_error_message_from_exception(e)
                         self.debug_print("No json data in results message: {}".format(err_msg))
                     else:
@@ -1869,7 +1859,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     try:
                         message_json = json.loads(result.get('message'))
                     except Exception as e:
-                        self._dump_error_log(e, "Error while deserialize message parameter.")
                         err_msg = self._get_error_message_from_exception(e)
                         self.debug_print("No json data in results message: {}".format(err_msg))
                     else:
@@ -1942,7 +1931,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             if MS_AZURE_REFRESH_TOKEN_STRING in resp_json:
                 self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
         except Exception as e:
-            self._dump_error_log(e, "Error occurred while generating access token.")
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while generating access token {}".format(err))
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
@@ -1985,7 +1973,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if subscription_id:
             self._subscription = subscription_id
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id", action_id)
         self.debug_print("subscription_id", self._subscription)
 
         if action_id == 'test_connectivity':

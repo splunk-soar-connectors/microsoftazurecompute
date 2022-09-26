@@ -184,7 +184,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -256,7 +259,7 @@
                     "data_path": "action_result.data.*.properties.osProfile.adminUsername",
                     "data_type": "string",
                     "example_values": [
-                        "phantom"
+                        "test"
                     ],
                     "contains": [
                         "user name"
@@ -591,7 +594,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -653,7 +659,7 @@
                     "data_path": "action_result.data.*.properties.osProfile.adminUsername",
                     "data_type": "string",
                     "example_values": [
-                        "phantom"
+                        "test-user"
                     ],
                     "contains": [
                         "user name"
@@ -1030,7 +1036,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.location",
@@ -1236,7 +1245,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -1247,7 +1259,7 @@
                     "example_values": [
                         "testVM"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -1347,7 +1359,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -1358,7 +1373,7 @@
                     "example_values": [
                         "testVM"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -1457,7 +1472,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -1468,7 +1486,7 @@
                     "example_values": [
                         "test"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -1567,7 +1585,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -1578,7 +1599,7 @@
                     "example_values": [
                         "testVM"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -1645,7 +1666,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.count.type",
@@ -1898,7 +1922,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -2030,7 +2057,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -2252,7 +2282,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -2654,7 +2687,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.default_security_rules",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.group_name",
@@ -2692,7 +2728,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.resource_guid",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.security_rules",
@@ -2703,13 +2742,16 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.tags",
                     "data_type": "string",
                     "example_values": [
-                        "{\"author\":\"Phantom\"}"
+                        "{\"author\":\"test-user\"}"
                     ]
                 },
                 {
@@ -2860,7 +2902,7 @@
                     "data_path": "action_result.data.*.tags.author",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "test-user"
                     ]
                 },
                 {
@@ -3019,7 +3061,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.tags",
@@ -3161,7 +3206,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.etag",
@@ -3388,7 +3436,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.virtual_network_name",
@@ -3571,7 +3622,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.virtual_network_name",
@@ -3696,7 +3750,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -3707,7 +3764,7 @@
                     "example_values": [
                         "abc"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -3806,7 +3863,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -3817,7 +3877,7 @@
                     "example_values": [
                         "virtualMachine1"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -3967,7 +4027,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -3978,7 +4041,7 @@
                     "example_values": [
                         "sample_vm"
                     ],
-                    "column_name": "Vm Name",
+                    "column_name": "VM Name",
                     "column_order": 2
                 },
                 {
@@ -4070,7 +4133,7 @@
             "read_only": true,
             "parameters": {
                 "results_url": {
-                    "description": "The name of the resource group",
+                    "description": "URL to fetch result of run command",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -4108,7 +4171,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.subscription_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "123asd789-2311-4zs1-12ms-180dra85a480"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
