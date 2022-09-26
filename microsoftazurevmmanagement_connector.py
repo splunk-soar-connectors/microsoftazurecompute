@@ -90,9 +90,6 @@ def _load_app_state(asset_id, app_connector=None):
         if app_connector:
             app_connector.debug_print('In _load_app_state: Exception: {0}'.format(str(e)))
 
-    if app_connector:
-        app_connector.debug_print('Successfully load state file')
-
     return state
 
 
@@ -119,9 +116,6 @@ def _save_app_state(state, asset_id, app_connector):
         if app_connector:
             app_connector.debug_print('In _save_app_state: Invalid asset_id')
         return {}
-
-    if app_connector:
-        app_connector.debug_print('Successfully save state file')
 
     try:
         with open(real_state_file_path, 'w+') as state_file_obj:
@@ -576,7 +570,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, asset_name = self._get_asset_name(action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
-
+        phantom_base_url = phantom_base_url.rstrip("//")
         self.save_progress('Using Phantom base URL as: {0}'.format(phantom_base_url))
         app_json = self.get_app_json()
         app_name = app_json['name']
