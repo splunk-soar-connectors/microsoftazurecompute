@@ -17,7 +17,7 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "Cloud tested 2021-09-21"
+        "Cloud tested 2022-09-30"
     ],
     "min_phantom_version": "5.3.3",
     "app_wizard_version": "1.0.0",
@@ -2456,7 +2456,7 @@
                     "data_path": "action_result.data.*.properties.securityRules.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "/subscriptions/4c357906-2c22-4d91-98aa-180d9a85a370/resourceGroups/Phantom_Test/providers/Microsoft.Network/networkSecurityGroups/phantom.vm-3-nsg/securityRules/SSH"
+                        "/subscriptions/4c357906-2c22-4d91-98aa-180d9a85a370/resourceGroups/Test_Group/providers/Microsoft.Network/networkSecurityGroups/test.vm-3-nsg/securityRules/SSH"
                     ]
                 },
                 {
@@ -3039,7 +3039,7 @@
                         "vm management group name"
                     ],
                     "example_values": [
-                        "asdf"
+                        "test_group"
                     ]
                 },
                 {
@@ -3084,7 +3084,7 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/applicationSecurityGroups/asdf"
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/applicationSecurityGroups/test_group"
                     ]
                 },
                 {
@@ -3098,7 +3098,7 @@
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "asdf"
+                        "example_name"
                     ],
                     "contains": [
                         "vm management group name"
@@ -3924,7 +3924,7 @@
             "action": "run command",
             "identifier": "run_command",
             "description": "Run a command on the virtual machine",
-            "verbose": "Run a command or a script in an Azure Windows or Linux VM. Refer to <a href='https://docs.microsoft.com/en-us/rest/api/compute/virtual%20machines%20run%20commands/runcommand' target='_blank'>API Docs</a> for more information.",
+            "verbose": "Run a command or a script in an Azure Windows or Linux VM. Refer to <a href='https://learn.microsoft.com/en-us/rest/api/compute/virtual-machines/run-command?tabs=HTTP' target='_blank'>API Docs</a> for more information.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -4129,7 +4129,7 @@
             "identifier": "get_results",
             "description": "Fetch the results of a previously executed run_command action",
             "verbose": "Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to <a href='https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command' target='_blank'>API Docs</a> for more information.",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "results_url": {

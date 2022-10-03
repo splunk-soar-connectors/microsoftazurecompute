@@ -496,26 +496,27 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_msg = MS_AZURE_UNKNOWN_ERR_MSG
         error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
+        error_msg = MS_AZURE_UNKNOWN_ERR_MSG
+
         self._dump_error_log(e, "Traceback: ")
+
         try:
-            if e.args:
+            if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
                     error_msg = e.args[0]
-            else:
-                error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
-                error_msg = MS_AZURE_UNKNOWN_ERR_MSG
         except Exception as e:
-            self._dump_error_log(e, "Error while parsing error message.")
-            error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
-            error_msg = MS_AZURE_UNKNOWN_ERR_MSG
+            self._dump_error_log(e, "Error occurred while fetching exception information.")
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+
+        return error_text
 
     def _get_asset_name(self, action_result):
         """ Get name of the asset using Phantom URL.
@@ -2050,12 +2051,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         self._state = self.load_state()
-        if not isinstance(self._state, dict):
-            self.debug_print("Reseting the state file with the default format")
-            self._state = {
-                "app_version": self.get_app_json().get('app_version')
-            }
-            return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERROR)
 
         # get the asset config
         config = self.get_config()
