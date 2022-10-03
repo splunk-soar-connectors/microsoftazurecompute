@@ -324,12 +324,16 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: loaded state
         """
         state = super().load_state()
+        if not isinstance(state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            state = {"app_version": self.get_app_json().get("app_version")}
+            return state
         try:
             state = self.decrypt_state(state, self.get_asset_id())
         except Exception as e:
             self._dump_error_log(e, "Error while loading state file.")
             state = None
-
+        self.debug_print(f"Load state ---> {state}")
         return state
 
     def save_state(self, state):
@@ -571,7 +575,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         ret_val, asset_name = self._get_asset_name(action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
-        phantom_base_url = phantom_base_url.rstrip("//")
+        phantom_base_url = phantom_base_url.rstrip("/")
         self.save_progress('Using Phantom base URL as: {0}'.format(phantom_base_url))
         app_json = self.get_app_json()
         app_name = app_json['name']
@@ -1895,20 +1899,9 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         else:
             self.refresh_token = self._state.get('token', {}).get('refresh_token', None)
             if from_action or self.refresh_token is not None:
-                # if self._state.get(MS_AZURE_STATE_IS_ENCRYPTED):
-                #     if self.refresh_token:
-                #         try:
-                #             data['refresh_token'] = self.decrypt_state(self._access_token)
-                #         except Exception as e:
-                #             self._dump_error_log(e, "{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
-                #             self.refresh_token = None
                 data['refresh_token'] = self.refresh_token
                 data['grant_type'] = 'refresh_token'
             elif self._state.get('code', None) is not None:
-                # try:
-                #     data['code'] = self.decrypt_state(self._state.get('code'))
-                # except Exception as e:
-                #     self._dump_error_log(e, "{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
                 data['code'] = self._state.get('code')
                 data['redirect_uri'] = self._state.get('redirect_uri')
                 data['grant_type'] = 'authorization_code'
@@ -2061,7 +2054,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
         self._admin_access = config.get(MS_AZURE_CONFIG_ADMIN_ACCESS)
         self._admin_consent = config.get(MS_AZURE_CONFIG_ADMIN_CONSENT)
-        self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
+        self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING, '')
 
         self.set_validator('ipv6', self._is_ip)
 
