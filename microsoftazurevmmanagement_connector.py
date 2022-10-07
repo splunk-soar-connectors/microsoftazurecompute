@@ -333,7 +333,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         except Exception as e:
             self._dump_error_log(e, "Error while loading state file.")
             state = None
-        self.debug_print(f"Load state ---> {state}")
         return state
 
     def save_state(self, state):
