@@ -495,11 +495,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _get_error_message_from_exception(self, e):
-        """ This function is used to get appropriate error message from the exception.
+        """
+        Get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
-        error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
+        error_code = None
         error_msg = MS_AZURE_UNKNOWN_ERR_MSG
 
         self._dump_error_log(e, "Traceback: ")
@@ -512,7 +513,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            self._dump_error_log(e, "Error occurred while fetching exception information.")
+            self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
