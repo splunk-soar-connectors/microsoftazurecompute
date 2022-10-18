@@ -11,7 +11,7 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
 {% block widget_content %}
 <!-- Main Start Block -->
 
-<!-- File: microsoftazurevmmanagement_list_snapshots.html
+<!-- File: microsoftazurecompute_snapshot_vm.html
   Copyright (c) 2019-2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,7 +86,6 @@ and limitations under the License.
             <div class="info">
             <h4 class="wf-h4-style">Info</h4>
             <table class="wf-table-vertical">
-                {% if result.param.resource_group_name %}
                 <tr>
                     <td>Resource Group Name</td>
                     <td>
@@ -99,6 +98,41 @@ and limitations under the License.
                         </a>
                     </td>
                 </tr>
+                <tr>
+                    <td>Snapshot Name</td>
+                    <td>{{ result.param.snapshot_name }}</td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td>{{ result.param.location }}</td>
+                </tr>
+                <tr>
+                    <td>Create Option</td>
+                    <td>{{ result.param.create_option }}</td>
+                </tr>
+                {% if result.param.image_reference %}
+                <tr>
+                    <td>Image Reference</td>
+                    <td>{{ result.param.image_reference }}</td>
+                </tr>
+                {% endif %}
+                {% if result.param.source_resource_id %}
+                <tr>
+                    <td>Source Resource ID</td>
+                    <td>{{ result.param.source_resource_id }}</td>
+                </tr>
+                {% endif %}
+                {% if result.param.source_uri %}
+                <tr>
+                    <td>Source URI</td>
+                    <td>{{ result.param.source_uri }}</td>
+                </tr>
+                {% endif %}
+                {% if result.param.storage_account_id %}
+                <tr>
+                    <td>Storage Account ID</td>
+                    <td>{{ result.param.storage_account_id }}</td>
+                </tr>
                 {% endif %}
             </table>
             </div>
@@ -110,14 +144,66 @@ and limitations under the License.
                         <td>{{ data.location }}</td>
                     </tr>
                     <tr>
-                        <th>Source Resource ID</th>
-                        <td>{{ data.properties.creationData.sourceResourceId }}</td>
+                        <th>Is Arm Resource</th>
+                        <td>{{ data.properties.isArmResource }}</td>
+                    </tr>
+                    <tr>
+                        <th>Disk Size (GB)</th>
+                        <td>{{ data.properties.diskSizeGB }}</td>
+                    </tr>
+                    <tr>
+                        <th>OS Type</th>
+                        <td>{{ data.properties.osType }}</td>
+                    </tr>
+                    <tr>
+                        <th>Fault Domain</th>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'],
+                            'value':'{{ data.properties.faultDomain }}' }], 0, {{ container.id }}, null, false);">
+                            {{ data.properties.faultDomain }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
                     </tr>
                     <tr>
                         <th>Provisioning State</th>
                         <td>{{ data.properties.provisioningState }}</td>
                     </tr>
+                    <tr>
+                        <th>Sku Name</th>
+                        <td>{{ data.sku.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Sku Tier</th>
+                        <td>{{ data.sku.tier }}</td>
+                    </tr>
+                    <tr>
+                        <th>Create Option</th>
+                        <td>{{ data.properties.creationData.createOption }}</td>
+                    </tr>
+                    <tr>
+                        <th>Source Resource ID</th>
+                        <td>{{ data.properties.creationData.sourceResourceId }}</td>
+                    </tr>
                 </table>
+
+                {% if data.tags %}
+                    <br>
+                    <table class="wf-table-horizontal">
+                        <tr>
+                            <th>Tag Name</th>
+                            <th>Tag Value</th>
+                        </tr>
+                        {% for key, val in data.tags.items %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ val }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+                <br>
 
             {% endfor %}
             <!-- loop for each data end -->

@@ -11,7 +11,7 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
 {% block widget_content %}
 <!-- Main Start Block -->
 
-<!-- File: microsoftazurevmmanagement_snapshot_vm.html
+<!-- File: microsoftazurecompute_list_virtual_networks.html
   Copyright (c) 2019-2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,6 +86,7 @@ and limitations under the License.
             <div class="info">
             <h4 class="wf-h4-style">Info</h4>
             <table class="wf-table-vertical">
+                {% if result.param.resource_group_name %}
                 <tr>
                     <td>Resource Group Name</td>
                     <td>
@@ -98,93 +99,56 @@ and limitations under the License.
                         </a>
                     </td>
                 </tr>
-                <tr>
-                    <td>Snapshot Name</td>
-                    <td>{{ result.param.snapshot_name }}</td>
-                </tr>
-                <tr>
-                    <td>Location</td>
-                    <td>{{ result.param.location }}</td>
-                </tr>
-                <tr>
-                    <td>Create Option</td>
-                    <td>{{ result.param.create_option }}</td>
-                </tr>
-                {% if result.param.image_reference %}
-                <tr>
-                    <td>Image Reference</td>
-                    <td>{{ result.param.image_reference }}</td>
-                </tr>
-                {% endif %}
-                {% if result.param.source_resource_id %}
-                <tr>
-                    <td>Source Resource ID</td>
-                    <td>{{ result.param.source_resource_id }}</td>
-                </tr>
-                {% endif %}
-                {% if result.param.source_uri %}
-                <tr>
-                    <td>Source URI</td>
-                    <td>{{ result.param.source_uri }}</td>
-                </tr>
-                {% endif %}
-                {% if result.param.storage_account_id %}
-                <tr>
-                    <td>Storage Account ID</td>
-                    <td>{{ result.param.storage_account_id }}</td>
-                </tr>
                 {% endif %}
             </table>
             </div>
+            <h3 class="wf-h3-style">Virtual Networks</h3>
             {% for data in result.data %}
+                <!-- Tags -->
                 <h3 class="wf-h4-style">{{ data.name }}</h3>
                 <table class="wf-table-vertical">
                     <tr>
-                        <th>Location</th>
-                        <td>{{ data.location }}</td>
-                    </tr>
-                    <tr>
-                        <th>Is Arm Resource</th>
-                        <td>{{ data.properties.isArmResource }}</td>
-                    </tr>
-                    <tr>
-                        <th>Disk Size (GB)</th>
-                        <td>{{ data.properties.diskSizeGB }}</td>
-                    </tr>
-                    <tr>
-                        <th>OS Type</th>
-                        <td>{{ data.properties.osType }}</td>
-                    </tr>
-                    <tr>
-                        <th>Fault Domain</th>
+                        <th>Network Name</th>
                         <td>
-                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'],
-                            'value':'{{ data.properties.faultDomain }}' }], 0, {{ container.id }}, null, false);">
-                            {{ data.properties.faultDomain }}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['vm management virtual network'],
+                            'value':'{{ data.name }}' }], 0, {{ container.id }}, null, false);">
+                            {{ data.name }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                             </a>
                         </td>
                     </tr>
                     <tr>
+                        <th>Etag</th>
+                        <td>{{ data.etag }}</td>
+                    </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td>{{ data.location }}</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ data.type }}</td>
+                    </tr>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ data.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Enable VM Protection</th>
+                        <td>{{ data.properties.enableVmProtection }}</td>
+                    </tr>
+                    <tr>
+                        <th>Enable DDOS Protection</th>
+                        <td>{{ data.properties.enableDdosProtection }}</td>
+                    </tr>
+                    <tr>
+                        <th>Resource GUID</th>
+                        <td>{{ data.properties.resourceGuid }}</td>
+                    </tr>
+                    <tr>
                         <th>Provisioning State</th>
                         <td>{{ data.properties.provisioningState }}</td>
-                    </tr>
-                    <tr>
-                        <th>Sku Name</th>
-                        <td>{{ data.sku.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Sku Tier</th>
-                        <td>{{ data.sku.tier }}</td>
-                    </tr>
-                    <tr>
-                        <th>Create Option</th>
-                        <td>{{ data.properties.creationData.createOption }}</td>
-                    </tr>
-                    <tr>
-                        <th>Source Resource ID</th>
-                        <td>{{ data.properties.creationData.sourceResourceId }}</td>
                     </tr>
                 </table>
 
@@ -203,6 +167,32 @@ and limitations under the License.
                         {% endfor %}
                     </table>
                 {% endif %}
+
+                {% if data.properties.subnets %}
+                    <br>
+                    {% for val in data.properties.subnets %}
+                        <table class="wf-table-vertical">
+                            <tr>
+                                <th>Subnet Name</th>
+                                <td>{{ val.name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Etag</th>
+                                <td>{{ val.etag }}</td>
+                            </tr>
+                            <tr>
+                                <th>Type</th>
+                                <td>{{ val.type }}</td>
+                            </tr>
+                            <tr>
+                                <th>ID</th>
+                                <td>{{ val.id }}</td>
+                            </tr>
+                        </table>
+                    {% endfor %}
+
+                {% endif %}
+
                 <br>
 
             {% endfor %}

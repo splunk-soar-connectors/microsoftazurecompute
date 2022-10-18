@@ -11,7 +11,7 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
 {% block widget_content %}
 <!-- Main Start Block -->
 
-<!-- File: microsoftazurevmmanagement_get_system_info.html
+<!-- File: microsoftazurecompute_list_vms.html
   Copyright (c) 2019-2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -86,6 +86,7 @@ and limitations under the License.
             <div class="info">
             <h4 class="wf-h4-style">Info</h4>
             <table class="wf-table-vertical">
+                {% if result.param.resource_group_name %}
                 <tr>
                     <td>Resource Group Name</td>
                     <td>
@@ -98,18 +99,7 @@ and limitations under the License.
                         </a>
                     </td>
                 </tr>
-                <tr>
-                    <td>VM Name</td>
-                    <td>
-                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['vm management virtual machine'],
-                        'value':'{{ result.param.vm_name }}' }], 0,
-                        {{ container.id }}, null, false);">
-                            {{ result.param.vm_name }}
-                            &nbsp;
-                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                        </a>
-                    </td>
-                </tr>
+                {% endif %}
             </table>
             </div>
             {% for data in result.data %}

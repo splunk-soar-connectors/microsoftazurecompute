@@ -4,8 +4,8 @@
     "description": "This app implements virtualization actions for Microsoft Azure Virtual Machines",
     "type": "virtualization",
     "product_vendor": "Microsoft",
-    "logo": "logo_microsoftazurevmmanagement.svg",
-    "logo_dark": "logo_microsoftazurevmmanagement_dark.svg",
+    "logo": "logo_microsoftazurecompute.svg",
+    "logo_dark": "logo_microsoftazurecompute_dark.svg",
     "product_name": "Azure Compute",
     "product_version_regex": ".*",
     "publisher": "Splunk",
@@ -13,7 +13,7 @@
     "app_version": "2.2.0",
     "utctime_updated": "2022-01-07T20:56:33.000000Z",
     "package_name": "phantom_microsoftazurecompute",
-    "main_module": "microsoftazurevmmanagement_connector.py",
+    "main_module": "microsoftazurecompute_connector.py",
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
@@ -26,7 +26,7 @@
             "name": "import-au"
         }
     ],
-    "rest_handler": "microsoftazurevmmanagement_connector._handle_rest_request",
+    "rest_handler": "microsoftazurecompute_connector._handle_rest_request",
     "configuration": {
         "subscription_id": {
             "description": "Subscription ID",

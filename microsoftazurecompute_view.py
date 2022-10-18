@@ -1,4 +1,4 @@
-# File: microsoftazurevmmanagement_view.py
+# File: microsoftazurecompute_view.py
 #
 # Copyright (c) 2019-2022 Splunk Inc.
 #
@@ -57,7 +57,7 @@ def display_list_tags(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_list_tags.html"
+    return "microsoftazurecompute_list_tags.html"
 
 
 def display_list_virtual_networks(provides, all_app_runs, context):
@@ -77,7 +77,7 @@ def display_list_virtual_networks(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_list_virtual_networks.html"
+    return "microsoftazurecompute_list_virtual_networks.html"
 
 
 def display_snapshot_vm(provides, all_app_runs, context):
@@ -97,7 +97,7 @@ def display_snapshot_vm(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_snapshot_vm.html"
+    return "microsoftazurecompute_snapshot_vm.html"
 
 
 def display_add_application_security_group(provides, all_app_runs, context):
@@ -117,7 +117,7 @@ def display_add_application_security_group(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_add_application_security_group.html"
+    return "microsoftazurecompute_add_application_security_group.html"
 
 
 def display_add_network_security_group(provides, all_app_runs, context):
@@ -137,7 +137,7 @@ def display_add_network_security_group(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_add_network_security_group.html"
+    return "microsoftazurecompute_add_network_security_group.html"
 
 
 def display_list_vms(provides, all_app_runs, context):
@@ -157,7 +157,7 @@ def display_list_vms(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_list_vms.html"
+    return "microsoftazurecompute_list_vms.html"
 
 
 def display_list_snapshots(provides, all_app_runs, context):
@@ -177,7 +177,7 @@ def display_list_snapshots(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_list_snapshots.html"
+    return "microsoftazurecompute_list_snapshots.html"
 
 
 def display_get_system_info(provides, all_app_runs, context):
@@ -197,4 +197,4 @@ def display_get_system_info(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
-    return "microsoftazurevmmanagement_get_system_info.html"
+    return "microsoftazurecompute_get_system_info.html"

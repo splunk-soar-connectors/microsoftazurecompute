@@ -1,4 +1,4 @@
-# File: microsoftazurevmmanagement_connector.py
+# File: microsoftazurecompute_connector.py
 #
 # Copyright (c) 2019-2022 Splunk Inc.
 #
@@ -32,7 +32,7 @@ from django.http import HttpResponse
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 
-from microsoftazurevmmanagement_consts import *
+from microsoftazurecompute_consts import *
 
 
 def _handle_login_redirect(request, key):
@@ -250,12 +250,12 @@ class RetVal(tuple):
         return tuple.__new__(RetVal, (val1, val2))
 
 
-class MicrosoftAzureVmManagementConnector(BaseConnector):
+class MicrosoftAzureComputeConnector(BaseConnector):
 
     def __init__(self):
 
         # Call the BaseConnectors init first
-        super(MicrosoftAzureVmManagementConnector, self).__init__()
+        super(MicrosoftAzureComputeConnector, self).__init__()
 
         self._state = None
         self._tenant = None
@@ -2122,7 +2122,7 @@ if __name__ == '__main__':
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
-        connector = MicrosoftAzureVmManagementConnector()
+        connector = MicrosoftAzureComputeConnector()
         connector.print_progress_message = True
 
         if (session_id is not None):

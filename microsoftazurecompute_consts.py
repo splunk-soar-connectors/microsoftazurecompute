@@ -1,4 +1,4 @@
-# File: microsoftazurevmmanagement_consts.py
+# File: microsoftazurecompute_consts.py
 #
 # Copyright (c) 2019-2022 Splunk Inc.
 #

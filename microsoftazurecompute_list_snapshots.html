@@ -11,7 +11,7 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
 {% block widget_content %}
 <!-- Main Start Block -->
 
-<!-- File: microsoftazurevmmanagement_add_application_security_group.html
+<!-- File: microsoftazurecompute_list_snapshots.html
   Copyright (c) 2019-2022 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
 either express or implied. See the License for the specific language governing permissions
 and limitations under the License.
 -->
+
 <style>
     .microsoftazurevmmanagement-app a:hover {
         text-decoration: underline;
@@ -85,6 +86,7 @@ and limitations under the License.
             <div class="info">
             <h4 class="wf-h4-style">Info</h4>
             <table class="wf-table-vertical">
+                {% if result.param.resource_group_name %}
                 <tr>
                     <td>Resource Group Name</td>
                     <td>
@@ -97,27 +99,6 @@ and limitations under the License.
                         </a>
                     </td>
                 </tr>
-                <tr>
-                    <td>Group Name</td>
-                    <td>
-                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['vm management group name'],
-                        'value':'{{ result.param.group_name }}' }], 0,
-                        {{ container.id }}, null, false);">
-                            {{ result.param.group_name }}
-                            &nbsp;
-                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Location</td>
-                    <td>{{ result.param.location }}</td>
-                </tr>
-                {% if result.param.tags %}
-                <tr>
-                    <td>Tags</td>
-                    <td>{{ result.param.tags }}</td>
-                </tr>
                 {% endif %}
             </table>
             </div>
@@ -125,20 +106,12 @@ and limitations under the License.
                 <h3 class="wf-h4-style">{{ data.name }}</h3>
                 <table class="wf-table-vertical">
                     <tr>
-                        <th>Etag</th>
-                        <td>{{ data.etag }}</td>
-                    </tr>
-                    <tr>
                         <th>Location</th>
                         <td>{{ data.location }}</td>
                     </tr>
                     <tr>
-                        <th>Type</th>
-                        <td>{{ data.type }}</td>
-                    </tr>
-                    <tr>
-                        <th>ID</th>
-                        <td>{{ data.id }}</td>
+                        <th>Source Resource ID</th>
+                        <td>{{ data.properties.creationData.sourceResourceId }}</td>
                     </tr>
                     <tr>
                         <th>Provisioning State</th>
@@ -146,29 +119,13 @@ and limitations under the License.
                     </tr>
                 </table>
 
-                {% if data.tags %}
-                    <br>
-                    <table class="wf-table-horizontal">
-                        <tr>
-                            <th>Tag Name</th>
-                            <th>Tag Value</th>
-                        </tr>
-                        {% for key, val in data.tags.items %}
-                        <tr>
-                            <td>{{ key }}</td>
-                            <td>{{ val }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                {% endif %}
-                <br>
-
             {% endfor %}
             <!-- loop for each data end -->
         {% else %}
             <h4 class="wf-h4-style">No data found</h4>
         {% endif %}
         <!-- loop for each data end -->
+
     {% endfor %}
     <!-- loop for each result end -->
 </div> <!-- Main Div -->
