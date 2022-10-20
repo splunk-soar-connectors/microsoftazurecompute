@@ -547,7 +547,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "Get System Info",
-                "view": "microsoftazurevmmanagement_view.display_get_system_info"
+                "view": "microsoftazurecompute_view.display_get_system_info"
             },
             "versions": "EQ(*)"
         },
@@ -894,7 +894,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "List Virtual Machines",
-                "view": "microsoftazurevmmanagement_view.display_list_vms"
+                "view": "microsoftazurecompute_view.display_list_vms"
             },
             "versions": "EQ(*)"
         },
@@ -1184,7 +1184,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "Snapshot Virtual Machine",
-                "view": "microsoftazurevmmanagement_view.display_snapshot_vm"
+                "view": "microsoftazurecompute_view.display_snapshot_vm"
             },
             "versions": "EQ(*)"
         },
@@ -1764,7 +1764,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "List Tags",
-                "view": "microsoftazurevmmanagement_view.display_list_tags"
+                "view": "microsoftazurecompute_view.display_list_tags"
             },
             "versions": "EQ(*)"
         },
@@ -2211,7 +2211,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "List Snapshots",
-                "view": "microsoftazurevmmanagement_view.display_list_snapshots"
+                "view": "microsoftazurecompute_view.display_list_snapshots"
             },
             "versions": "EQ(*)"
         },
@@ -2946,7 +2946,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "Add Network Security Group",
-                "view": "microsoftazurevmmanagement_view.display_add_network_security_group"
+                "view": "microsoftazurecompute_view.display_add_network_security_group"
             },
             "versions": "EQ(*)"
         },
@@ -3159,7 +3159,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "Add Application Security Group",
-                "view": "microsoftazurevmmanagement_view.display_add_application_security_group"
+                "view": "microsoftazurecompute_view.display_add_application_security_group"
             },
             "versions": "EQ(*)"
         },
@@ -3376,7 +3376,7 @@
                 "width": 10,
                 "height": 10,
                 "title": "List Virtual Networks",
-                "view": "microsoftazurevmmanagement_view.display_list_virtual_networks"
+                "view": "microsoftazurecompute_view.display_list_virtual_networks"
             },
             "versions": "EQ(*)"
         },
