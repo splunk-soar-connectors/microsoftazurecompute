@@ -2,11 +2,11 @@
 # Microsoft Azure Compute
 
 Publisher: Splunk  
-Connector Version: 2\.1\.2  
+Connector Version: 2\.2\.0  
 Product Vendor: Microsoft  
 Product Name: Azure Compute  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.2\.0  
+Minimum Product Version: 5\.3\.4  
 
 This app implements virtualization actions for Microsoft Azure Virtual Machines
 
@@ -191,10 +191,10 @@ No parameters are required for this action
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.data | string | 
 action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.data | string | 
 action\_result\.summary | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -209,11 +209,14 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.location | string | 
@@ -258,9 +261,8 @@ action\_result\.data\.\*\.resources\.\*\.type | string |
 action\_result\.data\.\*\.tags\.author | string | 
 action\_result\.data\.\*\.tags\.company | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -274,11 +276,14 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  optional  | Name of the resource group | string |  `vm management resource group` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.location | string | 
 action\_result\.data\.\*\.name | string |  `vm management virtual machine` 
@@ -291,8 +296,8 @@ action\_result\.data\.\*\.properties\.osProfile\.allowExtensionOperations | bool
 action\_result\.data\.\*\.properties\.osProfile\.computerName | string |  `vm management virtual machine` 
 action\_result\.data\.\*\.properties\.osProfile\.linuxConfiguration\.disablePasswordAuthentication | boolean | 
 action\_result\.data\.\*\.properties\.osProfile\.linuxConfiguration\.provisionVMAgent | boolean | 
-action\_result\.data\.\*\.properties\.osProfile\.linuxConfiguration\.ssh\.publicKeys\.\*\.path | string | 
 action\_result\.data\.\*\.properties\.osProfile\.linuxConfiguration\.ssh\.publicKeys\.\*\.keyData | string | 
+action\_result\.data\.\*\.properties\.osProfile\.linuxConfiguration\.ssh\.publicKeys\.\*\.path | string | 
 action\_result\.data\.\*\.properties\.osProfile\.windowsConfiguration\.enableAutomaticUpdates | boolean | 
 action\_result\.data\.\*\.properties\.osProfile\.windowsConfiguration\.provisionVMAgent | boolean | 
 action\_result\.data\.\*\.properties\.provisioningState | string | 
@@ -314,9 +319,8 @@ action\_result\.data\.\*\.tags\.author | string |
 action\_result\.data\.\*\.tags\.company | string | 
 action\_result\.data\.\*\.tags\.type | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_vms | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -337,16 +341,19 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **create\_option** |  required  | Source for disk's creation | string | 
 **source\_resource\_id** |  optional  | If create\_option is Copy, this is the ARM ID of the source snapshot or disk | string | 
 **source\_uri** |  optional  | If create\_option is Import, this is the URI of a blob to be imported into a managed disk | string | 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.create\_option | string | 
 action\_result\.parameter\.location | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
 action\_result\.parameter\.snapshot\_name | string | 
 action\_result\.parameter\.source\_resource\_id | string | 
 action\_result\.parameter\.source\_uri | string | 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.location | string | 
 action\_result\.data\.\*\.name | string | 
 action\_result\.data\.\*\.properties\.creationData\.createOption | string | 
@@ -361,10 +368,9 @@ action\_result\.data\.\*\.properties\.provisioningState | string |
 action\_result\.data\.\*\.sku\.name | string | 
 action\_result\.data\.\*\.sku\.tier | string | 
 action\_result\.data\.\*\.tags\.author | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.provisioning\_state | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -379,16 +385,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -403,16 +411,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -427,16 +437,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -451,16 +463,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -471,11 +485,15 @@ Type: **investigate**
 Read only: **True**
 
 #### Action Parameters
-No parameters are required for this action
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.count\.type | string | 
 action\_result\.data\.\*\.count\.value | numeric | 
 action\_result\.data\.\*\.id | string | 
@@ -484,9 +502,8 @@ action\_result\.data\.\*\.values\.\*\.count\.type | string |
 action\_result\.data\.\*\.values\.\*\.count\.value | numeric | 
 action\_result\.data\.\*\.values\.\*\.id | string | 
 action\_result\.data\.\*\.values\.\*\.tagValue | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_tags | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -501,10 +518,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **tag\_name** |  required  | The name of the tag | string |  `vm management tag name` 
 **tag\_value** |  optional  | The value of the tag to create or update | string | 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.tag\_name | string |  `vm management tag name` 
 action\_result\.parameter\.tag\_value | string | 
 action\_result\.data | string | 
@@ -512,9 +532,8 @@ action\_result\.data\.\*\.count\.type | string |
 action\_result\.data\.\*\.count\.value | numeric | 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.tagName | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -525,20 +544,23 @@ Type: **investigate**
 Read only: **True**
 
 #### Action Parameters
-No parameters are required for this action
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.location | string | 
 action\_result\.data\.\*\.name | string |  `vm management resource group` 
 action\_result\.data\.\*\.properties\.provisioningState | string | 
 action\_result\.data\.\*\.tags\.company | string | 
 action\_result\.data\.\*\.tags\.\{"keyname"\: "keyvalue"\} | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_resource\_groups | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -552,11 +574,14 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  optional  | The name of the resource group | string |  `vm management resource group` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.location | string | 
 action\_result\.data\.\*\.name | string |  `vm management tag name` 
@@ -573,9 +598,8 @@ action\_result\.data\.\*\.sku\.tier | string |
 action\_result\.data\.\*\.tags\.author | string | 
 action\_result\.data\.\*\.tags\.type | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_snapshots | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -592,12 +616,15 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **group\_type** |  required  | Type of security group to query | string | 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.group\_type | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.etag | string | 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.location | string | 
@@ -619,24 +646,22 @@ action\_result\.data\.\*\.properties\.defaultSecurityRules\.\*\.type | string |
 action\_result\.data\.\*\.properties\.networkInterfaces\.\*\.id | string | 
 action\_result\.data\.\*\.properties\.provisioningState | string | 
 action\_result\.data\.\*\.properties\.resourceGuid | string | 
-action\_result\.data\.\*\.properties\.securityRules\.\*\.id | string | 
 action\_result\.data\.\*\.properties\.securityRules\.\*\.etag | string | 
+action\_result\.data\.\*\.properties\.securityRules\.\*\.id | string | 
 action\_result\.data\.\*\.properties\.securityRules\.\*\.name | string | 
-action\_result\.data\.\*\.properties\.securityRules\.\*\.type | string | 
 action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.access | string | 
+action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.destinationAddressPrefix | string | 
+action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.destinationPortRange | string | 
+action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.direction | string | 
 action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.priority | numeric | 
 action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.protocol | string | 
-action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.direction | string | 
-action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.sourcePortRange | string | 
-ction\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.provisioningState | string | 
 action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.sourceAddressPrefix | string | 
-action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.destinationPortRange | string | 
-action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.destinationAddressPrefix | string | 
+action\_result\.data\.\*\.properties\.securityRules\.\*\.properties\.sourcePortRange | string | 
+action\_result\.data\.\*\.properties\.securityRules\.\*\.type | string | 
 action\_result\.data\.\*\.tags\.author | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_security\_groups | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -659,10 +684,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **provisioning\_state** |  optional  | The provisioning state of the public IP resource | string | 
 **resource\_guid** |  optional  | The resource GUID property of the network security group resource | string | 
 **security\_rules** |  optional  | Comma separated list of security rules of the network security group | string | 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.default\_security\_rules | string | 
 action\_result\.parameter\.group\_name | string |  `vm management group name` 
 action\_result\.parameter\.location | string | 
@@ -670,6 +697,7 @@ action\_result\.parameter\.provisioning\_state | string |
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
 action\_result\.parameter\.resource\_guid | string | 
 action\_result\.parameter\.security\_rules | string | 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.tags | string | 
 action\_result\.data\.\*\.etag | string | 
 action\_result\.data\.\*\.id | string | 
@@ -693,9 +721,8 @@ action\_result\.data\.\*\.properties\.provisioningState | string |
 action\_result\.data\.\*\.properties\.resourceGuid | string | 
 action\_result\.data\.\*\.tags\.author | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -712,13 +739,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **group\_name** |  required  | Name of security group to add | string |  `vm management group name` 
 **location** |  required  | Resource location | string | 
 **tags** |  optional  | String object of resource tags\. It should be in JSON format | string | 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.group\_name | string |  `vm management group name` 
 action\_result\.parameter\.location | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.tags | string | 
 action\_result\.data\.\*\.etag | string | 
 action\_result\.data\.\*\.id | string | 
@@ -727,9 +757,8 @@ action\_result\.data\.\*\.name | string |  `vm management group name`
 action\_result\.data\.\*\.properties\.provisioningState | string | 
 action\_result\.data\.\*\.tags\.author | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -743,11 +772,14 @@ Read only: **True**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  optional  | The name of the resource group | string |  `vm management resource group` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data\.\*\.etag | string | 
 action\_result\.data\.\*\.id | string | 
 action\_result\.data\.\*\.location | string | 
@@ -766,9 +798,8 @@ action\_result\.data\.\*\.properties\.subnets\.\*\.properties\.provisioningState
 action\_result\.data\.\*\.properties\.subnets\.\*\.type | string | 
 action\_result\.data\.\*\.tags\.author | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_virtual\_networks | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -783,11 +814,14 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **virtual\_network\_name** |  required  | The name of the virtual network | string |  `vm management virtual network` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.virtual\_network\_name | string |  `vm management virtual network` 
 action\_result\.data\.\*\.etag | string | 
 action\_result\.data\.\*\.id | string | 
@@ -796,9 +830,8 @@ action\_result\.data\.\*\.properties\.addressPrefix | string |
 action\_result\.data\.\*\.properties\.ipConfigurations\.\*\.id | string | 
 action\_result\.data\.\*\.properties\.provisioningState | string | 
 action\_result\.data\.\*\.type | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_subnets | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -814,18 +847,20 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **virtual\_network\_name** |  required  | The name of the virtual network | string |  `vm management virtual network` 
 **ip\_address** |  required  | The private IP address to be verified | string |  `ip`  `ipv6` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.ip\_address | string |  `ip`  `ipv6` 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.virtual\_network\_name | string |  `vm management virtual network` 
 action\_result\.data\.\*\.availableAddress | string |  `ip`  `ipv6` 
 action\_result\.summary\.available | boolean | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.num\_ips\_available | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -840,16 +875,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -864,16 +901,18 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **resource\_group\_name** |  required  | The name of the resource group | string |  `vm management resource group` 
 **vm\_name** |  required  | The name of the virtual machine | string |  `vm management virtual machine` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -883,7 +922,7 @@ Run a command on the virtual machine
 Type: **generic**  
 Read only: **False**
 
-Run a command or a script in an Azure Windows or Linux VM\. Refer to <a href='https\://docs\.microsoft\.com/en\-us/rest/api/compute/virtual%20machines%20run%20commands/runcommand' target='\_blank'>API Docs</a> for more information\.
+Run a command or a script in an Azure Windows or Linux VM\. Refer to <a href='https\://learn\.microsoft\.com/en\-us/rest/api/compute/virtual\-machines/run\-command?tabs=HTTP' target='\_blank'>API Docs</a> for more information\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -893,31 +932,33 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **command\_id** |  required  | The command to run against the VM | string |  `vm management command id` 
 **script** |  optional  | The script to be executed\. When this value is given, the given script will override the default script of the command | string | 
 **script\_parameters** |  optional  | The run command parameters | string | 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
-action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
+action\_result\.status | string | 
 action\_result\.parameter\.command\_id | string |  `vm management command id` 
+action\_result\.parameter\.resource\_group\_name | string |  `vm management resource group` 
 action\_result\.parameter\.script | string | 
 action\_result\.parameter\.script\_parameters | string | 
+action\_result\.parameter\.subscription\_id | string | 
+action\_result\.parameter\.vm\_name | string |  `vm management virtual machine` 
 action\_result\.data | string | 
+action\_result\.data\.\*\.displayStatus | string | 
 action\_result\.data\.\*\.results\_url | string |  `vm management results url` 
 action\_result\.data\.results\.\*\.code | string | 
 action\_result\.data\.results\.\*\.level | string | 
 action\_result\.data\.results\.\*\.message | string | 
-action\_result\.data\.\*\.displayStatus | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
 ## action: 'get results'
 Fetch the results of a previously executed run\_command action
 
-Type: **generic**  
+Type: **investigate**  
 Read only: **True**
 
 Commands in Azure can take up to 90 minutes to execute\. This allows you to retrieve results of previously executed actions\. Refer to <a href='https\://docs\.microsoft\.com/en\-us/azure/virtual\-machines/windows/run\-command' target='\_blank'>API Docs</a> for more information\.
@@ -925,20 +966,22 @@ Commands in Azure can take up to 90 minutes to execute\. This allows you to retr
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**results\_url** |  required  | The name of the resource group | string |  `vm management results url` 
+**results\_url** |  required  | URL to fetch result of run command | string |  `vm management results url` 
+**subscription\_id** |  optional  | Subscription ID to overwrite asset configuration value | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.results\_url | string |  `vm management results url` 
+action\_result\.parameter\.subscription\_id | string | 
 action\_result\.data | string | 
-action\_result\.data\.results\_url | string | 
+action\_result\.data\.\*\.displayStatus | string | 
 action\_result\.data\.results\.\*\.code | string | 
 action\_result\.data\.results\.\*\.level | string | 
 action\_result\.data\.results\.\*\.message | string | 
-action\_result\.data\.\*\.displayStatus | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.data\.results\_url | string | 
 action\_result\.summary\.status | string | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric | 
