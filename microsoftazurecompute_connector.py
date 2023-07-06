@@ -324,15 +324,16 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         :return: loaded state
         """
         state = super().load_state()
+        self.save_progress(f"load super state:{state}")
         if not isinstance(state, dict):
-            self.debug_print("Resetting the state file with the default format")
+            self.save_progress("Resetting the state file with the default format")
             state = {"app_version": self.get_app_json().get("app_version")}
             return state
         try:
             state = self.decrypt_state(state, self.get_asset_id())
         except Exception as e:
-            self._dump_error_log(e, "Error while loading state file.")
-            state = None
+            self.save_progress("Error while loading state file.")
+            state = {}
         return state
 
     def save_state(self, state):
@@ -2044,6 +2045,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
 
         self._state = self.load_state()
+        self.save_progress(f"load initialize state:{self._state}")
 
         # get the asset config
         config = self.get_config()
