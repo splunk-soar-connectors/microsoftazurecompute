@@ -316,6 +316,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         state["is_encrypted"] = True
 
         return state
+    
+    def reset_state(self):
+        """
+        Reset the state file with app version
+        """
+        self.save_progress("Resetting the state file with the default format")
+        return {"app_version": self.get_app_json().get("app_version")}
 
     def load_state(self):
         """
@@ -326,14 +333,12 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         state = super().load_state()
         self.save_progress(f"load super state:{state}")
         if not isinstance(state, dict):
-            self.save_progress("Resetting the state file with the default format")
-            state = {"app_version": self.get_app_json().get("app_version")}
-            return state
+            return self.reset_state()
         try:
             state = self.decrypt_state(state, self.get_asset_id())
         except Exception as e:
             self.save_progress("Error while loading state file.")
-            state = {}
+            state = self.reset_state()
         return state
 
     def save_state(self, state):
