@@ -1,6 +1,6 @@
 # File: microsoftazurecompute_consts.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 # and limitations under the License.
 #
 #
-# Define your constants here
 MS_BASE_URL = "https://management.azure.com/subscriptions/{subscriptionId}"
 
 VM_GET_SYSTEM_INFO_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}?api-version=2018-06-01"

@@ -1,6 +1,6 @@
 # File: microsoftazurecompute_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -316,7 +316,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         state["is_encrypted"] = True
 
         return state
-    
+
     def reset_state(self):
         """
         Reset the state file with app version
@@ -331,13 +331,12 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         :return: loaded state
         """
         state = super().load_state()
-        self.save_progress(f"load super state:{state}")
         if not isinstance(state, dict):
             return self.reset_state()
         try:
             state = self.decrypt_state(state, self.get_asset_id())
         except Exception as e:
-            self.save_progress("Error while loading state file.")
+            self._dump_error_log(e, "Error while loading state file.")
             state = self.reset_state()
         return state
 
@@ -538,7 +537,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         asset_id = self.get_asset_id()
         rest_endpoint = MS_AZURE_PHANTOM_ASSET_INFO_URL.format(asset_id=asset_id)
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), rest_endpoint)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)   # nosemgrep
 
         if phantom.is_fail(ret_val):
             return ret_val, None
@@ -557,7 +556,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
 
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), MS_AZURE_PHANTOM_SYS_INFO_URL)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)   # nosemgrep
         if phantom.is_fail(ret_val):
             return ret_val, None
 
@@ -2050,7 +2049,6 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
 
         self._state = self.load_state()
-        self.save_progress(f"load initialize state:{self._state}")
 
         # get the asset config
         config = self.get_config()
