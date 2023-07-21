@@ -615,15 +615,15 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
-        except requests.exceptions.InvalidSchema:
+        except requests.exceptions.InvalidSchema as e:
             self._dump_error_log(e, "Error while REST call for InvalidSchema.")
             error_message = 'Error connecting to server. No connection adapters were found for {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
-        except requests.exceptions.InvalidURL:
+        except requests.exceptions.InvalidURL as e:
             self._dump_error_log(e, "Error while REST call for InvalidURL.")
             error_message = 'Error connecting to server. Invalid URL {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
             self._dump_error_log(e, "Error while REST call for ConnectionError.")
             error_message = 'Error Details: Connection Refused from the Server {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)

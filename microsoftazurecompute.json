@@ -17,9 +17,9 @@
     "python_version": "3",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "Cloud tested 2022-09-30"
+        "Cloud tested 2023-07-28"
     ],
-    "min_phantom_version": "5.3.4",
+    "min_phantom_version": "6.0.2",
     "app_wizard_version": "1.0.0",
     "contributors": [
         {
