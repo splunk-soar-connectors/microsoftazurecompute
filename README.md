@@ -2,7 +2,7 @@
 # Microsoft Azure Compute
 
 Publisher: Splunk  
-Connector Version: 2.2.0  
+Connector Version: 2.2.1  
 Product Vendor: Microsoft  
 Product Name: Azure Compute  
 Product Version Supported (regex): ".\*"  
@@ -11,7 +11,7 @@ Minimum Product Version: 5.3.4
 This app implements virtualization actions for Microsoft Azure Virtual Machines
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
