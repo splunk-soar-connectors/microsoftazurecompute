@@ -411,7 +411,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         message = message.replace('{', '{{').replace('}', '}}')
 
         if status_code == MS_AZURE_BAD_REQUEST_CODE:
-            message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERROR)
+            message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERR)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -664,7 +664,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and any(message in msg for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+        if msg and any(message in msg for message in MS_AZURE_INVALID_TOKEN_MSG):
             ret_val = self._get_token(action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
@@ -721,7 +721,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
-        if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+        if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MSG):
             ret_val = self._get_token(action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), resp_json, None
@@ -753,7 +753,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                         error_msg = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                             error_msg)), resp_json, None
-                    if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+                    if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MSG):
                         ret_val = self._get_token(action_result)
                         if phantom.is_fail(ret_val):
                             return action_result.get_status(), resp_json, None
@@ -766,7 +766,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                     error_msg = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
                         error_msg)), resp_json, None
-                if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+                if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MSG):
                     ret_val = self._get_token(action_result)
                     if phantom.is_fail(ret_val):
                         return action_result.get_status(), resp_json, None
