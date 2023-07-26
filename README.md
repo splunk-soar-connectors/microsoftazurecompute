@@ -6,7 +6,7 @@ Connector Version: 2.3.0
 Product Vendor: Microsoft  
 Product Name: Azure Compute  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.3.4  
+Minimum Product Version: 6.0.2  
 
 This app implements virtualization actions for Microsoft Azure Virtual Machines
 
