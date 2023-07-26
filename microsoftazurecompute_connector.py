@@ -416,7 +416,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         message = message.replace('{', '{{').replace('}', '}}')
 
         if status_code == MS_AZURE_BAD_REQUEST_CODE:
-            message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERROR)
+            message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERR)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -735,7 +735,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                 r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message)), resp_json, None
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message)), resp_json, None
 
         # Azure returns a status code 202 for Run Command if there is an Asynchronous Operation running
         if r.status_code == 202:
