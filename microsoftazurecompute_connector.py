@@ -1,6 +1,6 @@
 # File: microsoftazurecompute_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -317,6 +317,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         return state
 
+    def reset_state(self):
+        """
+        Reset the state file with app version
+        """
+        self.save_progress("Resetting the state file with the default format")
+        return {"app_version": self.get_app_json().get("app_version")}
+
     def load_state(self):
         """
         Load the contents of the state file to the state dictionary and decrypt it.
@@ -325,14 +332,12 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
         state = super().load_state()
         if not isinstance(state, dict):
-            self.debug_print("Resetting the state file with the default format")
-            state = {"app_version": self.get_app_json().get("app_version")}
-            return state
+            return self.reset_state()
         try:
             state = self.decrypt_state(state, self.get_asset_id())
         except Exception as e:
             self._dump_error_log(e, "Error while loading state file.")
-            state = None
+            state = self.reset_state()
         return state
 
     def save_state(self, state):
@@ -411,7 +416,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         message = message.replace('{', '{{').replace('}', '}}')
 
         if status_code == MS_AZURE_BAD_REQUEST_CODE:
-            message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERROR)
+            message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=MS_AZURE_HTML_ERR)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -427,9 +432,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(error_msg)), None)
+                                                   format(error_message)), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -501,7 +506,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         :return: error message
         """
         error_code = None
-        error_msg = MS_AZURE_UNKNOWN_ERR_MSG
+        err_msg = MS_AZURE_UNKNOWN_ERR_MSG
 
         self._dump_error_log(e, "Traceback: ")
 
@@ -509,16 +514,16 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    err_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_msg = e.args[0]
+                    err_msg = e.args[0]
         except Exception as e:
             self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
-            error_text = "Error Message: {}".format(error_msg)
+            error_text = "Error Message: {}".format(err_msg)
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, err_msg)
 
         return error_text
 
@@ -532,7 +537,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         asset_id = self.get_asset_id()
         rest_endpoint = MS_AZURE_PHANTOM_ASSET_INFO_URL.format(asset_id=asset_id)
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), rest_endpoint)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)   # nosemgrep
 
         if phantom.is_fail(ret_val):
             return ret_val, None
@@ -551,7 +556,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
 
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), MS_AZURE_PHANTOM_SYS_INFO_URL)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)   # nosemgrep
         if phantom.is_fail(ret_val):
             return ret_val, None
 
@@ -610,22 +615,22 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
-        except requests.exceptions.InvalidSchema:
+        except requests.exceptions.InvalidSchema as e:
             self._dump_error_log(e, "Error while REST call for InvalidSchema.")
             error_message = 'Error connecting to server. No connection adapters were found for {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
-        except requests.exceptions.InvalidURL:
+        except requests.exceptions.InvalidURL as e:
             self._dump_error_log(e, "Error while REST call for InvalidURL.")
             error_message = 'Error connecting to server. Invalid URL {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
             self._dump_error_log(e, "Error while REST call for ConnectionError.")
             error_message = 'Error Details: Connection Refused from the Server {}'.format(endpoint)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
-                                                   .format(error_msg)), resp_json)
+                                                   .format(error_message)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -664,7 +669,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and any(message in msg for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+        if msg and any(message in msg for message in MS_AZURE_INVALID_TOKEN_MSGS):
             ret_val = self._get_token(action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
@@ -718,10 +723,10 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         try:
             r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message)), resp_json, None
 
-        if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+        if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MSGS):
             ret_val = self._get_token(action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), resp_json, None
@@ -729,8 +734,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             try:
                 r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
             except Exception as e:
-                error_msg = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                error_message = self._get_error_message_from_exception(e)
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message)), resp_json, None
 
         # Azure returns a status code 202 for Run Command if there is an Asynchronous Operation running
         if r.status_code == 202:
@@ -750,10 +756,10 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                         res = request_func(operation_status, headers=headers, verify=verify)
                         resp_json = res.json()
                     except Exception as e:
-                        error_msg = self._get_error_message_from_exception(e)
+                        error_message = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
-                            error_msg)), resp_json, None
-                    if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+                            error_message)), resp_json, None
+                    if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MSGS):
                         ret_val = self._get_token(action_result)
                         if phantom.is_fail(ret_val):
                             return action_result.get_status(), resp_json, None
@@ -763,10 +769,10 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                 try:
                     r = request_func(location_url, headers=headers, verify=verify)
                 except Exception as e:
-                    error_msg = self._get_error_message_from_exception(e)
+                    error_message = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
-                        error_msg)), resp_json, None
-                if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+                        error_message)), resp_json, None
+                if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MSGS):
                     ret_val = self._get_token(action_result)
                     if phantom.is_fail(ret_val):
                         return action_result.get_status(), resp_json, None
@@ -774,9 +780,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                     try:
                         r = request_func(location_url, headers=headers, verify=verify)
                     except Exception as e:
-                        error_msg = self._get_error_message_from_exception(e)
+                        error_message = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
-                            error_msg)), resp_json, None
+                            error_message)), resp_json, None
                 ret_val, response = self._process_response(r, action_result)
                 return ret_val, response, location_url
         elif r.status_code == 200:
@@ -1438,9 +1444,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             self._dump_error_log(e, "Error while deserialize tags parameter.")
-            error_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Load input tags failed, {0}".format(error_msg))
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Load input tags failed, {0}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_message, param='tags'))
         if default_security_rules:
             body['properties'].update({'defaultSecurityRules': default_security_rules})
         if provisioning_state:
@@ -1501,9 +1507,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                 sg_tags = json.loads(tags)
                 body['tags'].update(sg_tags)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            self.debug_print("Load input tags failed, {0}".format(error_msg))
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Load input tags failed, {0}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_message, param='tags'))
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
@@ -1804,8 +1810,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                     try:
                         message_json = json.loads(result.get('message'))
                     except Exception as e:
-                        err_msg = self._get_error_message_from_exception(e)
-                        self.debug_print("No json data in results message: {}".format(err_msg))
+                        error_message = self._get_error_message_from_exception(e)
+                        self.debug_print("No json data in results message: {}".format(error_message))
                     else:
                         data['results'][index]['message'] = message_json
             action_result.add_data(data)
@@ -1858,8 +1864,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                     try:
                         message_json = json.loads(result.get('message'))
                     except Exception as e:
-                        err_msg = self._get_error_message_from_exception(e)
-                        self.debug_print("No json data in results message: {}".format(err_msg))
+                        error_message = self._get_error_message_from_exception(e)
+                        self.debug_print("No json data in results message: {}".format(error_message))
                     else:
                         data['results'][index]['message'] = message_json
             action_result.add_data(data)
