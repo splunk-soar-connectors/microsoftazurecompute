@@ -1,6 +1,6 @@
 # File: microsoftazurecompute_consts.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 # and limitations under the License.
 #
 #
-# Define your constants here
 MS_BASE_URL = "https://management.azure.com/subscriptions/{subscriptionId}"
 
 VM_GET_SYSTEM_INFO_ENDPOINT = "/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}?api-version=2018-06-01"
@@ -56,10 +55,7 @@ MS_AZURE_PHANTOM_SYS_INFO_URL = '/system_info'
 MS_AZURE_PHANTOM_ASSET_INFO_URL = '/asset/{asset_id}'
 MS_AZURE_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
                                 'Please specify this value in System Settings.'
-MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The request URL is invalid.'
-
-MS_AZURE_ENCRYPTION_ERROR = "Error occurred while encrypting the state file."
-MS_AZURE_DECRYPTION_ERROR = "Error occurred while decrypting the state file."
+MS_AZURE_HTML_ERR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The request URL is invalid.'
 
 # For authorization code
 TC_FILE = "oauth_task.out"
@@ -83,13 +79,11 @@ MS_AZURE_INVALID_PERMISSION_ERR = "Error occurred while saving the newly generat
 MS_AZURE_INVALID_PERMISSION_ERR += " Please check the owner, owner group, and the permissions of the state file. The Phantom "
 MS_AZURE_INVALID_PERMISSION_ERR += "user should have the correct access rights and ownership for the corresponding state file \
 (refer to readme file for more information)."
-MS_AZURE_STATE_FILE_CORRUPT_ERROR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. \
-Please try again."
 MS_AZURE_ERR_MSG = "Status Code: {status_code}. Data from server: {err_msg}"
 MS_AZURE_SERVER_ERR_MSG = "Error from server"
 MS_AZURE_INVALID_JSON = "{err_msg}: Invalid format of body. Please provide valid JSON format in the '{param}' action parameter"
 MS_AZURE_GROUP_TYPE_ERR_MSG = "Please provide a valid value in the 'group_type' action parameter. Expected values are 'application' or 'network'"
-MS_AZURE_INVALID_TOKEN_MESSAGES = ['token is invalid', 'Access token has expired', 'ExpiredAuthenticationToken', 'AuthenticationFailed']
+MS_AZURE_INVALID_TOKEN_MSGS = ['token is invalid', 'Access token has expired', 'ExpiredAuthenticationToken', 'AuthenticationFailed']
 MS_AZURE_TIMEOUT = 30
 MS_AZURE_BAD_REQUEST_CODE = 400
 MS_AZURE_NOT_FOUND_CODE = 404
