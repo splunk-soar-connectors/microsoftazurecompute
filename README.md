@@ -1,7 +1,7 @@
 # Microsoft Azure Compute
 
 Publisher: Splunk \
-Connector Version: 2.3.0 \
+Connector Version: 2.3.1 \
 Product Vendor: Microsoft \
 Product Name: Azure Compute \
 Minimum Product Version: 6.0.2
