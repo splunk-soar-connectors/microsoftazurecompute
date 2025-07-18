@@ -433,6 +433,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # Show only error message if available
+        message = None
         if resp_json.get("error") and isinstance(resp_json.get("error", {}), dict):
             resp_code = resp_json.get("error", {}).get("code")
             resp_msg = resp_json.get("error", {}).get("message")
@@ -444,7 +445,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             message = "{}. {}".format(
                 MS_AZURE_SERVER_ERR_MSG, MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_json["error"])
             )
-        else:
+
+        # Default message if none of the above conditions are met
+        if message is None:
             message = "{}. {}".format(
                 MS_AZURE_SERVER_ERR_MSG,
                 MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=response.text.replace("{", "{{").replace("}", "}}")),
@@ -782,8 +785,7 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             message = "Can't process response from server. {}".format(
                 MS_AZURE_ERR_MSG.format(status_code=r.status_code, err_msg=r.text.replace("{", "{{").replace("}", "}}"))
             )
-
-        return action_result.set_status(phantom.APP_ERROR, message), resp_json, None
+            return action_result.set_status(phantom.APP_ERROR, message), resp_json, None
 
     def _get_admin_access(self, action_result, app_rest_url, app_state):
         """This function is used to get admin access for given credentials.
