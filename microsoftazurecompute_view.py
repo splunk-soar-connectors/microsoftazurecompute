@@ -24,18 +24,18 @@ def _get_ctx_result(provides, result):
 
     param = result.get_param()
     summary = result.get_summary()
-    data = result.get_data()
+    result_data = result.get_data()
 
     ctx_result["param"] = param
     if summary:
         ctx_result["summary"] = summary
 
-    if not data:
+    if not result_data:
         ctx_result["data"] = {}
         return ctx_result
 
     ctx_result["action"] = provides
-    ctx_result["data"] = data
+    ctx_result["data"] = result_data
 
     return ctx_result
 
