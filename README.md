@@ -1,9 +1,9 @@
 # Microsoft Azure Compute
 
-Publisher: Splunk \
-Connector Version: 2.3.1 \
-Product Vendor: Microsoft \
-Product Name: Azure Compute \
+Publisher: Splunk <br>
+Connector Version: 2.3.1 <br>
+Product Vendor: Microsoft <br>
+Product Name: Azure Compute <br>
 Minimum Product Version: 6.0.2
 
 This app implements virtualization actions for Microsoft Azure Virtual Machines
@@ -23,35 +23,35 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[generate token](#action-generate-token) - Generates a token \
-[get system info](#action-get-system-info) - Get information about a VM \
-[list vms](#action-list-vms) - Get the list of registered VMs \
-[snapshot vm](#action-snapshot-vm) - Take a snapshot of the VM \
-[start vm](#action-start-vm) - Start a stopped or suspended VM \
-[stop vm](#action-stop-vm) - Stop a VM \
-[delete vm](#action-delete-vm) - Delete a VM \
-[deallocate vm](#action-deallocate-vm) - Shut down the virtual machine and release the compute resources. You are not billed for the compute resource that this virtual machine uses \
-[list tags](#action-list-tags) - Get the names and values of all resource tags that are defined in the subscription \
-[create tag](#action-create-tag) - Create or update a tag \
-[list resource groups](#action-list-resource-groups) - Get the list of resource groups for the subscription \
-[list snapshots](#action-list-snapshots) - Get the list of snapshots under the subscription \
-[list security groups](#action-list-security-groups) - Get the list of all security groups in a resource group \
-[add network group](#action-add-network-group) - Add a network security group in a resource group \
-[add application group](#action-add-application-group) - Add an application security groups in a resource group \
-[list virtual networks](#action-list-virtual-networks) - Get the list of virtual networks \
-[list subnets](#action-list-subnets) - Get the list of subnets \
-[get ip availability](#action-get-ip-availability) - Check if a private IP address is available for use \
-[generalize vm](#action-generalize-vm) - Set the state of the virtual machine to be generalized \
-[redeploy vm](#action-redeploy-vm) - Redeploy a virtual machine \
-[run command](#action-run-command) - Run a command on the virtual machine \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[generate token](#action-generate-token) - Generates a token <br>
+[get system info](#action-get-system-info) - Get information about a VM <br>
+[list vms](#action-list-vms) - Get the list of registered VMs <br>
+[snapshot vm](#action-snapshot-vm) - Take a snapshot of the VM <br>
+[start vm](#action-start-vm) - Start a stopped or suspended VM <br>
+[stop vm](#action-stop-vm) - Stop a VM <br>
+[delete vm](#action-delete-vm) - Delete a VM <br>
+[deallocate vm](#action-deallocate-vm) - Shut down the virtual machine and release the compute resources. You are not billed for the compute resource that this virtual machine uses <br>
+[list tags](#action-list-tags) - Get the names and values of all resource tags that are defined in the subscription <br>
+[create tag](#action-create-tag) - Create or update a tag <br>
+[list resource groups](#action-list-resource-groups) - Get the list of resource groups for the subscription <br>
+[list snapshots](#action-list-snapshots) - Get the list of snapshots under the subscription <br>
+[list security groups](#action-list-security-groups) - Get the list of all security groups in a resource group <br>
+[add network group](#action-add-network-group) - Add a network security group in a resource group <br>
+[add application group](#action-add-application-group) - Add an application security groups in a resource group <br>
+[list virtual networks](#action-list-virtual-networks) - Get the list of virtual networks <br>
+[list subnets](#action-list-subnets) - Get the list of subnets <br>
+[get ip availability](#action-get-ip-availability) - Check if a private IP address is available for use <br>
+[generalize vm](#action-generalize-vm) - Set the state of the virtual machine to be generalized <br>
+[redeploy vm](#action-redeploy-vm) - Redeploy a virtual machine <br>
+[run command](#action-run-command) - Run a command on the virtual machine <br>
 [get results](#action-get-results) - Fetch the results of a previously executed run_command action
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -66,7 +66,7 @@ No Output
 
 Generates a token
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 This action generated a new token whenever any action fails because of an invalid or expired token.
@@ -90,7 +90,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a VM
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -161,7 +161,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the list of registered VMs
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -230,7 +230,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Take a snapshot of the VM
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 While creating a snapshot using the COPY option, 'source_resource_id' parameter is required and while using the IMPORT option, 'source_uri' parameter is required. For the 'source_uri' parameter, the uri value should be valid page blob uri path. For more information refer to <a href='https://docs.microsoft.com/en-us/rest/api/compute/snapshots/create-or-update' target='_blank'>API Docs</a>.
@@ -283,7 +283,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Start a stopped or suspended VM
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -312,7 +312,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Stop a VM
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -341,7 +341,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete a VM
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -370,7 +370,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Shut down the virtual machine and release the compute resources. You are not billed for the compute resource that this virtual machine uses
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -399,7 +399,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the names and values of all resource tags that are defined in the subscription
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -431,7 +431,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create or update a tag
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -464,7 +464,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the list of resource groups for the subscription
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -494,7 +494,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the list of snapshots under the subscription
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -536,7 +536,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the list of all security groups in a resource group
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 API limitation: Network Security Group (classic) is not part of the response.
@@ -601,7 +601,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a network security group in a resource group
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 The 'security_rules' parameter accept JSON format value. For non-JSON values, the parameter values will be ignored. Refer to <a href='https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networksecuritygroups/createorupdate' target='_blank'>API Docs</a> for more information on adding a network security group.
@@ -665,7 +665,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add an application security groups in a resource group
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -704,7 +704,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the list of virtual networks
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -748,7 +748,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get the list of subnets
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -783,7 +783,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Check if a private IP address is available for use
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -815,7 +815,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Set the state of the virtual machine to be generalized
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -844,7 +844,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Redeploy a virtual machine
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -873,7 +873,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Run a command on the virtual machine
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Run a command or a script in an Azure Windows or Linux VM. Refer to <a href='https://learn.microsoft.com/en-us/rest/api/compute/virtual-machines/run-command?tabs=HTTP' target='_blank'>API Docs</a> for more information.
@@ -915,7 +915,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Fetch the results of a previously executed run_command action
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to <a href='https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command' target='_blank'>API Docs</a> for more information.
