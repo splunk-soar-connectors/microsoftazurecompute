@@ -5,3 +5,4 @@
 * Bound interactive OAuth callbacks to the authorization flow that initiated them.
 * Prevented action parameters and result URLs from traversing outside their intended Azure Resource Manager paths.
 * Kept OAuth tokens out of the connector's application-directory handshake state.
+* Restricted authenticated asynchronous-operation requests to the Azure Resource Manager origin.

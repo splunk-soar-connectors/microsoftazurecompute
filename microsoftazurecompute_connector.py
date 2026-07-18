@@ -384,6 +384,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             return False
         return re.fullmatch(r"[^/%?#\\\x00-\x1f\x7f]+", value) is not None
 
+    def _is_allowed_arm_url(self, value):
+        """Return whether an absolute URL is safe for an ARM bearer token."""
+        if not isinstance(value, str):
+            return False
+        parsed_url = urlparse(value)
+        return parsed_url.scheme == "https" and parsed_url.netloc == "management.azure.com"
+
     def _dump_error_log(self, error, message="Exception occurred."):
         self.error_print(message, dump_object=error)
 
@@ -754,6 +761,12 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             operation_status = r.headers.get("Azure-AsyncOperation")
             location_url = r.headers.get("Location")
             if operation_status:
+                if not self._is_allowed_arm_url(operation_status) or not self._is_allowed_arm_url(location_url):
+                    return (
+                        action_result.set_status(phantom.APP_ERROR, "Azure returned an invalid asynchronous operation URL"),
+                        resp_json,
+                        None,
+                    )
                 status = "InProgress"
                 count = 0
                 # It can take some time for the results to be ready.
