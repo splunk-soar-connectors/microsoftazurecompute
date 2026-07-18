@@ -95,7 +95,7 @@ and limitations under the License.
                 <td>Resource Group Name</td>
                 <td>
                   <a href="javascript:;"
-                     onclick="context_menu(this, [{'contains': ['vm management resource group'], 'value':'{{ result.param.resource_group_name }}' }], 0, {{ container.id }}, null, false);">
+                     onclick="context_menu(this, [{'contains': ['vm management resource group'], 'value':'{{ result.param.resource_group_name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                     {{ result.param.resource_group_name }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -114,7 +114,7 @@ and limitations under the License.
               <th>Network Name</th>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['vm management virtual network'], 'value':'{{ data.name }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['vm management virtual network'], 'value':'{{ data.name|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ data.name }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
