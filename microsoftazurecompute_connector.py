@@ -1935,7 +1935,6 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, f"Error occurred while generating access token {err}")
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
-        _save_app_state(self._state, self.get_asset_id(), self)
 
         return phantom.APP_SUCCESS
 
@@ -2094,7 +2093,6 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
         return phantom.APP_SUCCESS
 
 
