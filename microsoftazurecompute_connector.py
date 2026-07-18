@@ -16,11 +16,13 @@
 #
 # Phantom App imports
 import grp
+import hmac
 import ipaddress
 import json
 import os
 import pwd
 import re
+import secrets
 import sys
 import time
 
@@ -131,11 +133,20 @@ def _handle_login_response(request):
     :return: HttpResponse. The response displayed on authorization URL page
     """
 
-    asset_id = request.GET.get("state")
-    if not asset_id:
+    oauth_state = request.GET.get("state")
+    if not oauth_state or ":" not in oauth_state:
         return HttpResponse(
             f"ERROR: Asset ID not found in URL\n{json.dumps(request.GET)}", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE
         )
+
+    asset_id, presented_nonce = oauth_state.split(":", 1)
+    if not asset_id.isalnum():
+        return HttpResponse("ERROR: Invalid OAuth state", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
+
+    state = _load_app_state(asset_id)
+    stored_nonce = state.get("oauth_state_nonce", "")
+    if not stored_nonce or not hmac.compare_digest(stored_nonce, presented_nonce):
+        return HttpResponse("ERROR: Invalid OAuth state", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
 
     # Check for error in URL
     error = request.GET.get("error")
@@ -157,7 +168,7 @@ def _handle_login_response(request):
             f"Error while authenticating\n{json.dumps(request.GET)}", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE
         )
 
-    state = _load_app_state(asset_id)
+    state.pop("oauth_state_nonce", None)
 
     # If value of admin_consent is available
     if admin_consent:
@@ -207,8 +218,9 @@ def _handle_rest_request(request, path_parts):
     # To handle response from microsoft login page
     if call_type == "result":
         return_val = _handle_login_response(request)
-        asset_id = request.GET.get("state")  # nosemgrep
-        if asset_id and asset_id.isalnum():
+        oauth_state = request.GET.get("state", "")  # nosemgrep
+        asset_id = oauth_state.split(":", 1)[0]
+        if return_val.status_code < 400 and asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = f"{app_dir}/{asset_id}_{TC_FILE}"
             real_auth_status_file_path = os.path.abspath(auth_status_file_path)
@@ -796,10 +808,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
 
         # Create the url authorization, this is the one pointing to the oauth server side
+        flow_nonce = secrets.token_urlsafe(32)
+        app_state["oauth_state_nonce"] = flow_nonce
+        oauth_state = f"{self.get_asset_id()}:{flow_nonce}"
         admin_consent_url = f"https://login.microsoftonline.com/{self._tenant}/adminconsent"
         admin_consent_url += f"?client_id={self._client_id}"
         admin_consent_url += "&redirect_uri={}".format(app_state["redirect_uri"])
-        admin_consent_url += f"&state={self.get_asset_id()}"
+        admin_consent_url += f"&state={oauth_state}"
 
         app_state["admin_consent_url"] = admin_consent_url
 
@@ -889,10 +904,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                 if phantom.is_fail(result):
                     return self.get_status()
 
+            flow_nonce = secrets.token_urlsafe(32)
+            app_state["oauth_state_nonce"] = flow_nonce
+            oauth_state = f"{self.get_asset_id()}:{flow_nonce}"
             admin_consent_url = f"https://login.microsoftonline.com/{self._tenant}/oauth2/v2.0/authorize"
             admin_consent_url += f"?client_id={self._client_id}"
             admin_consent_url += f"&redirect_uri={redirect_uri}"
-            admin_consent_url += f"&state={self.get_asset_id()}"
+            admin_consent_url += f"&state={oauth_state}"
             admin_consent_url += f"&scope={MS_AZURE_CODE_GENERATION_SCOPE}"
             admin_consent_url += "&response_type=code"
 
