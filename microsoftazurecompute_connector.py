@@ -20,11 +20,13 @@ import hmac
 import ipaddress
 import json
 import os
+import posixpath
 import pwd
 import re
 import secrets
 import sys
 import time
+from urllib.parse import unquote, urlparse
 
 import encryption_helper
 import phantom.app as phantom
@@ -375,6 +377,12 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             return False
 
         return True
+
+    def _is_safe_arm_path_value(self, value):
+        """Return whether an action value is safe to place in an ARM URL path."""
+        if not isinstance(value, str) or not value or value in {".", ".."}:
+            return False
+        return re.fullmatch(r"[^/%?#\\\x00-\x1f\x7f]+", value) is not None
 
     def _dump_error_log(self, error, message="Exception occurred."):
         self.error_print(message, dump_object=error)
@@ -1062,6 +1070,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         snapshot_name = param.get("snapshot_name")
         location = param["location"]
 
+        if not self._is_safe_arm_path_value(snapshot_name):
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid snapshot_name path value")
+
         create_option = param["create_option"]
         source_resource_id = param.get("source_resource_id", None)
         source_uri = param.get("source_uri", None)
@@ -1243,6 +1254,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         tag_name = param.get("tag_name")
         tag_value = param.get("tag_value")
+
+        if tag_value and not self._is_safe_arm_path_value(tag_value):
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid tag_value path value")
 
         # If not tag_value, then create tag_name
         if not tag_value:
@@ -1834,19 +1848,20 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         results_url = param["results_url"]
-        # Capture information from param results_url and ensure that the subscription id matches the asset
-        pattern = re.compile(r"https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)")
-        try:
-            subscription_id, endpoint = re.search(pattern, results_url).groups()
-        except AttributeError as e:
-            self._dump_error_log(e, "Error while searching pattern in results_url parameter.")
+        parsed_url = urlparse(results_url)
+        normalized_path = posixpath.normpath(unquote(parsed_url.path))
+        subscription_path = f"/subscriptions/{self._subscription}"
+        if (
+            parsed_url.scheme != "https"
+            or parsed_url.netloc != "management.azure.com"
+            or parsed_url.fragment
+            or not normalized_path.startswith(f"{subscription_path}/")
+        ):
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'results_url' action parameter")
 
-        if subscription_id != self._subscription:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Cannot retrieve 'run command' results from a different Azure Subscription than the configured Subscription on this asset",
-            )
+        endpoint = normalized_path[len(subscription_path) :]
+        if parsed_url.query:
+            endpoint = f"{endpoint}?{parsed_url.query}"
 
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="get")
 
@@ -1957,6 +1972,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         subscription_id = param.get("subscription_id", None)
         if subscription_id:
+            if not self._is_safe_arm_path_value(subscription_id):
+                return self.set_status(phantom.APP_ERROR, "Please provide a valid subscription_id path value")
             self._subscription = subscription_id
 
         self.debug_print("action_id", action_id)
@@ -2055,6 +2072,14 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING, "")
 
         self.set_validator("ipv6", self._is_ip)
+        for contains_type in (
+            "vm management group name",
+            "vm management resource group",
+            "vm management tag name",
+            "vm management virtual machine",
+            "vm management virtual network",
+        ):
+            self.set_validator(contains_type, self._is_safe_arm_path_value)
 
         return phantom.APP_SUCCESS
 
