@@ -9,7 +9,7 @@
     "product_name": "Azure Compute",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2025 Splunk Inc.",
+    "license": "Copyright (c) 2019-2026 Splunk Inc.",
     "app_version": "2.3.2",
     "utctime_updated": "2025-09-05T16:39:53.355249Z",
     "package_name": "phantom_microsoftazurecompute",

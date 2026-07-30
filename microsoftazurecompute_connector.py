@@ -1,6 +1,6 @@
 # File: microsoftazurecompute_connector.py
 #
-# Copyright (c) 2019-2025 Splunk Inc.
+# Copyright (c) 2019-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 #
 # Phantom App imports
 import grp
+import hmac
 import ipaddress
 import json
 import os
+import posixpath
 import pwd
 import re
+import secrets
 import sys
 import time
+from urllib.parse import unquote, urlparse
 
 import encryption_helper
 import phantom.app as phantom
@@ -131,11 +135,20 @@ def _handle_login_response(request):
     :return: HttpResponse. The response displayed on authorization URL page
     """
 
-    asset_id = request.GET.get("state")
-    if not asset_id:
+    oauth_state = request.GET.get("state")
+    if not oauth_state or ":" not in oauth_state:
         return HttpResponse(
             f"ERROR: Asset ID not found in URL\n{json.dumps(request.GET)}", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE
         )
+
+    asset_id, presented_nonce = oauth_state.split(":", 1)
+    if not asset_id.isalnum():
+        return HttpResponse("ERROR: Invalid OAuth state", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
+
+    state = _load_app_state(asset_id)
+    stored_nonce = state.get("oauth_state_nonce", "")
+    if not stored_nonce or not hmac.compare_digest(stored_nonce, presented_nonce):
+        return HttpResponse("ERROR: Invalid OAuth state", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
 
     # Check for error in URL
     error = request.GET.get("error")
@@ -157,7 +170,7 @@ def _handle_login_response(request):
             f"Error while authenticating\n{json.dumps(request.GET)}", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE
         )
 
-    state = _load_app_state(asset_id)
+    state.pop("oauth_state_nonce", None)
 
     # If value of admin_consent is available
     if admin_consent:
@@ -207,8 +220,9 @@ def _handle_rest_request(request, path_parts):
     # To handle response from microsoft login page
     if call_type == "result":
         return_val = _handle_login_response(request)
-        asset_id = request.GET.get("state")  # nosemgrep
-        if asset_id and asset_id.isalnum():
+        oauth_state = request.GET.get("state", "")  # nosemgrep
+        asset_id = oauth_state.split(":", 1)[0]
+        if return_val.status_code < 400 and asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = f"{app_dir}/{asset_id}_{TC_FILE}"
             real_auth_status_file_path = os.path.abspath(auth_status_file_path)
@@ -363,6 +377,19 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             return False
 
         return True
+
+    def _is_safe_arm_path_value(self, value):
+        """Return whether an action value is safe to place in an ARM URL path."""
+        if not isinstance(value, str) or not value or value in {".", ".."}:
+            return False
+        return re.fullmatch(r"[^/%?#\\\x00-\x1f\x7f]+", value) is not None
+
+    def _is_allowed_arm_url(self, value):
+        """Return whether an absolute URL is safe for an ARM bearer token."""
+        if not isinstance(value, str):
+            return False
+        parsed_url = urlparse(value)
+        return parsed_url.scheme == "https" and parsed_url.netloc == "management.azure.com"
 
     def _dump_error_log(self, error, message="Exception occurred."):
         self.error_print(message, dump_object=error)
@@ -734,6 +761,12 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             operation_status = r.headers.get("Azure-AsyncOperation")
             location_url = r.headers.get("Location")
             if operation_status:
+                if not self._is_allowed_arm_url(operation_status) or not self._is_allowed_arm_url(location_url):
+                    return (
+                        action_result.set_status(phantom.APP_ERROR, "Azure returned an invalid asynchronous operation URL"),
+                        resp_json,
+                        None,
+                    )
                 status = "InProgress"
                 count = 0
                 # It can take some time for the results to be ready.
@@ -796,10 +829,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         """
 
         # Create the url authorization, this is the one pointing to the oauth server side
+        flow_nonce = secrets.token_urlsafe(32)
+        app_state["oauth_state_nonce"] = flow_nonce
+        oauth_state = f"{self.get_asset_id()}:{flow_nonce}"
         admin_consent_url = f"https://login.microsoftonline.com/{self._tenant}/adminconsent"
         admin_consent_url += f"?client_id={self._client_id}"
         admin_consent_url += "&redirect_uri={}".format(app_state["redirect_uri"])
-        admin_consent_url += f"&state={self.get_asset_id()}"
+        admin_consent_url += f"&state={oauth_state}"
 
         app_state["admin_consent_url"] = admin_consent_url
 
@@ -889,10 +925,13 @@ class MicrosoftAzureComputeConnector(BaseConnector):
                 if phantom.is_fail(result):
                     return self.get_status()
 
+            flow_nonce = secrets.token_urlsafe(32)
+            app_state["oauth_state_nonce"] = flow_nonce
+            oauth_state = f"{self.get_asset_id()}:{flow_nonce}"
             admin_consent_url = f"https://login.microsoftonline.com/{self._tenant}/oauth2/v2.0/authorize"
             admin_consent_url += f"?client_id={self._client_id}"
             admin_consent_url += f"&redirect_uri={redirect_uri}"
-            admin_consent_url += f"&state={self.get_asset_id()}"
+            admin_consent_url += f"&state={oauth_state}"
             admin_consent_url += f"&scope={MS_AZURE_CODE_GENERATION_SCOPE}"
             admin_consent_url += "&response_type=code"
 
@@ -1043,6 +1082,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         resource_group_name = param.get("resource_group_name")
         snapshot_name = param.get("snapshot_name")
         location = param["location"]
+
+        if not self._is_safe_arm_path_value(snapshot_name):
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid snapshot_name path value")
 
         create_option = param["create_option"]
         source_resource_id = param.get("source_resource_id", None)
@@ -1225,6 +1267,9 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         tag_name = param.get("tag_name")
         tag_value = param.get("tag_value")
+
+        if tag_value and not self._is_safe_arm_path_value(tag_value):
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid tag_value path value")
 
         # If not tag_value, then create tag_name
         if not tag_value:
@@ -1816,19 +1861,20 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         results_url = param["results_url"]
-        # Capture information from param results_url and ensure that the subscription id matches the asset
-        pattern = re.compile(r"https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)")
-        try:
-            subscription_id, endpoint = re.search(pattern, results_url).groups()
-        except AttributeError as e:
-            self._dump_error_log(e, "Error while searching pattern in results_url parameter.")
+        parsed_url = urlparse(results_url)
+        normalized_path = posixpath.normpath(unquote(parsed_url.path))
+        subscription_path = f"/subscriptions/{self._subscription}"
+        if (
+            parsed_url.scheme != "https"
+            or parsed_url.netloc != "management.azure.com"
+            or parsed_url.fragment
+            or not normalized_path.startswith(f"{subscription_path}/")
+        ):
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'results_url' action parameter")
 
-        if subscription_id != self._subscription:
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Cannot retrieve 'run command' results from a different Azure Subscription than the configured Subscription on this asset",
-            )
+        endpoint = normalized_path[len(subscription_path) :]
+        if parsed_url.query:
+            endpoint = f"{endpoint}?{parsed_url.query}"
 
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="get")
 
@@ -1902,7 +1948,6 @@ class MicrosoftAzureComputeConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, f"Error occurred while generating access token {err}")
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
-        _save_app_state(self._state, self.get_asset_id(), self)
 
         return phantom.APP_SUCCESS
 
@@ -1939,6 +1984,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         subscription_id = param.get("subscription_id", None)
         if subscription_id:
+            if not self._is_safe_arm_path_value(subscription_id):
+                return self.set_status(phantom.APP_ERROR, "Please provide a valid subscription_id path value")
             self._subscription = subscription_id
 
         self.debug_print("action_id", action_id)
@@ -2037,6 +2084,14 @@ class MicrosoftAzureComputeConnector(BaseConnector):
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING, "")
 
         self.set_validator("ipv6", self._is_ip)
+        for contains_type in (
+            "vm management group name",
+            "vm management resource group",
+            "vm management tag name",
+            "vm management virtual machine",
+            "vm management virtual network",
+        ):
+            self.set_validator(contains_type, self._is_safe_arm_path_value)
 
         return phantom.APP_SUCCESS
 
@@ -2051,7 +2106,6 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
         return phantom.APP_SUCCESS
 
 
