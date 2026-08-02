@@ -1,0 +1,30 @@
+import ast
+import unittest
+from pathlib import Path
+
+
+CONNECTOR = Path(__file__).resolve().parents[1] / "microsoftazurecompute_connector.py"
+
+
+def _function_source(name):
+    source = CONNECTOR.read_text()
+    tree = ast.parse(source)
+    function = next(node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef) and node.name == name)
+    return ast.get_source_segment(source, function)
+
+
+class OAuthStartValidationTests(unittest.TestCase):
+    def test_redirect_requires_pending_nonce_before_url_lookup(self):
+        source = _function_source("_handle_login_redirect")
+        self.assertIn('request.GET.get("state_nonce", "")', source)
+        self.assertIn("hmac.compare_digest", source)
+        self.assertLess(source.index("hmac.compare_digest"), source.index("state.get(key)"))
+
+    def test_user_and_admin_start_links_carry_nonce(self):
+        source = CONNECTOR.read_text()
+        self.assertEqual(source.count('urlencode({"asset_id": self.get_asset_id(), "state_nonce": flow_nonce})'), 2)
+        self.assertEqual(source.count('start_oauth?{start_query}'), 2)
+
+
+if __name__ == "__main__":
+    unittest.main()
