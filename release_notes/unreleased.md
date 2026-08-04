@@ -1,3 +1,1 @@
 **Unreleased**
-
-* Require the pending flow nonce before returning OAuth authorization redirects.
