@@ -26,7 +26,7 @@ import re
 import secrets
 import sys
 import time
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlencode, urlparse
 
 import encryption_helper
 import phantom.app as phantom
@@ -53,6 +53,10 @@ def _handle_login_redirect(request, key):
     state = _load_app_state(asset_id)
     if not state:
         return HttpResponse("ERROR: Invalid asset_id", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
+    presented_nonce = request.GET.get("state_nonce", "")
+    stored_nonce = state.get("oauth_state_nonce", "")
+    if not stored_nonce or not hmac.compare_digest(stored_nonce, presented_nonce):
+        return HttpResponse("ERROR: Invalid OAuth state", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
     url = state.get(key)
     if not url:
         return HttpResponse(f"App state is invalid, {key} not found.", content_type="text/plain", status=MS_AZURE_BAD_REQUEST_CODE)
@@ -841,7 +845,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
         # The URL that the user should open in a different tab.
         # This is pointing to a REST endpoint that points to the app
-        url_to_show = f"{app_rest_url}/start_oauth?asset_id={self.get_asset_id()}&"
+        start_query = urlencode({"asset_id": self.get_asset_id(), "state_nonce": flow_nonce})
+        url_to_show = f"{app_rest_url}/start_oauth?{start_query}"
 
         # Save the state, will be used by the request handler
         _save_app_state(app_state, self.get_asset_id(), self)
@@ -939,7 +944,8 @@ class MicrosoftAzureComputeConnector(BaseConnector):
 
             # The URL that the user should open in a different tab.
             # This is pointing to a REST endpoint that points to the app
-            url_to_show = f"{app_rest_url}/start_oauth?asset_id={self.get_asset_id()}&"
+            start_query = urlencode({"asset_id": self.get_asset_id(), "state_nonce": flow_nonce})
+            url_to_show = f"{app_rest_url}/start_oauth?{start_query}"
 
             # Save the state, will be used by the request handler
             _save_app_state(app_state, self.get_asset_id(), self)
