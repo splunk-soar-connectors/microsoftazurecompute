@@ -13,8 +13,8 @@
     "app_version": "2.3.4",
     "utctime_updated": "2026-08-04T00:11:09.783866Z",
     "package_name": "phantom_microsoftazurecompute",
-    "main_module": "microsoftazurecompute_connector.py",
-    "python_version": "3.9, 3.13",
+    "main_module": "src.app:app",
+    "python_version": "3.13",
     "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud tested 2023-07-28"
@@ -32,37 +32,43 @@
             "description": "Subscription ID",
             "data_type": "string",
             "required": true,
-            "order": 0
+            "order": 0,
+            "category": "connectivity"
         },
         "tenant_id": {
             "description": "Tenant ID",
             "data_type": "string",
             "required": true,
-            "order": 1
+            "order": 1,
+            "category": "connectivity"
         },
         "client_id": {
             "description": "Application (client) ID assigned to your Azure Compute app",
             "data_type": "string",
             "required": true,
-            "order": 2
+            "order": 2,
+            "category": "connectivity"
         },
         "client_secret": {
             "description": "Client Secret",
             "data_type": "password",
             "required": true,
-            "order": 3
+            "order": 3,
+            "category": "connectivity"
         },
         "admin_access": {
             "description": "Admin Access Required",
             "data_type": "boolean",
             "default": true,
-            "order": 4
+            "order": 4,
+            "category": "connectivity"
         },
         "admin_consent": {
             "description": "Admin consent already provided",
             "data_type": "boolean",
             "default": true,
-            "order": 5
+            "order": 5,
+            "category": "connectivity"
         }
     },
     "actions": [
