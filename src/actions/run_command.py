@@ -15,8 +15,15 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
-from ..helper import make_async_request, validate_arm_path_value
+from ..command_output import CommandResponseOutput
+from ..helper import (
+    AsyncOperationError,
+    failed_table_result,
+    make_async_request,
+    validate_arm_path_value,
+)
 from ..consts import VM_RUN_COMMAND_ENDPOINT
 from ..helper import normalize_command_results, parse_command_list
 
@@ -46,32 +53,22 @@ class RunCommandParams(Params):
     )
 
 
-class RunCommandResultOutput(PermissiveActionOutput):
-    code: str = OutputField(
-        example_values=[
-            "ComponentStatus/StdOut/succeeded",
-            "ComponentStatus/StdErr/succeeded",
-        ]
-    )
-    level: str = OutputField(example_values=["Info", "Error", "Warning"])
-    message: str = OutputField()
-
-
 class RunCommandOutput(PermissiveActionOutput):
+    operation_url: str | None = OutputField(cef_types=["url"])
+    operation_status: str | None = OutputField()
     resource_group_name: str = OutputField(column_name="Resource Group Name")
     vm_name: str = OutputField(column_name="VM Name")
     command_id: str = OutputField(column_name="Command ID")
     script: str = OutputField(column_name="Script")
     script_parameters: str = OutputField(column_name="Parameters")
-    displayStatus: str = OutputField(example_values=["Provisioning succeeded"])
-    results_url: str = OutputField(
+    results_url: str | None = OutputField(
         column_name="Results URL",
         cef_types=["vm management results url"],
         example_values=[
             "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
         ],
     )
-    results: list[RunCommandResultOutput] | None = OutputField()
+    results: CommandResponseOutput = OutputField()
 
 
 class RunCommandSummary(ActionOutput):
@@ -87,10 +84,10 @@ class RunCommandSummary(ActionOutput):
     render_as="table",
     output_class=RunCommandOutput,
 )
+@preserve_failure_params
 def run_command(
     params: RunCommandParams, soar: SOARClient, asset: Asset
 ) -> RunCommandOutput:
-
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     vm_name = validate_arm_path_value(params.vm_name, "vm_name")
     script = parse_command_list(params.script, "script", allow_plain_text=True)
@@ -103,9 +100,27 @@ def run_command(
         "parameters": script_parameters,
     }
     endpoint = VM_RUN_COMMAND_ENDPOINT.format(resourceGroupName=group, vmName=vm_name)
-    response, results_url = make_async_request(
-        asset, endpoint, subscription_id=params.subscription_id, json_body=body
-    )
+    try:
+        response, results_url = make_async_request(
+            asset, endpoint, subscription_id=params.subscription_id, json_body=body
+        )
+    except AsyncOperationError as exc:
+        return failed_table_result(
+            str(exc),
+            params.model_dump(by_alias=True),
+            RunCommandOutput(
+                operation_url=exc.operation_url,
+                operation_status=exc.operation_status,
+                results_url=exc.results_url,
+                results=exc.response,
+                resource_group_name=params.resource_group_name,
+                vm_name=params.vm_name,
+                command_id=params.command_id,
+                script=params.script or "",
+                script_parameters=params.script_parameters or "",
+            ),
+            RunCommandSummary(status=str(exc)),
+        )
     data = normalize_command_results(response, results_url)
     soar.set_summary(RunCommandSummary(status="Successfully executed command"))
     soar.set_message("Status: Successfully executed command")

@@ -20,9 +20,64 @@ from soar_sdk.auth.client import (
     SOARAssetOAuthClient,
     TokenExpiredError,
 )
-from soar_sdk.auth.models import OAuthConfig, OAuthGrantType
+from soar_sdk.auth.models import OAuthConfig, OAuthGrantType, OAuthState, OAuthToken
+
+from soar_sdk.exceptions import ActionFailure
+from soar_sdk.shims.phantom.encryption_helper import encryption_helper
 
 from .consts import MS_AZURE_CODE_GENERATION_SCOPE, MS_AZURE_RESOURCE, SERVER_TOKEN_URL
+
+
+def migrate_legacy_oauth_state(asset) -> None:
+    """Import delegated legacy tokens once, before SDK authentication consumes them."""
+    if is_client_credentials(asset):
+        return
+    auth_state = asset.auth_state
+    current = auth_state.get_all()
+    oauth = current.get("oauth")
+    # A new authorization session must also win, so reauthorization can recover
+    # an asset whose legacy encrypted credentials are unreadable.
+    if isinstance(oauth, dict) and (oauth.get("token") or oauth.get("session")):
+        return
+
+    legacy = auth_state.backend.load_state() or {}
+    if not isinstance(legacy, dict):
+        return
+    legacy_token = legacy.get("token")
+    if not isinstance(legacy_token, dict):
+        return
+    access = legacy_token.get("access_token")
+    refresh = legacy_token.get("refresh_token")
+    if not access and not refresh:
+        return
+
+    try:
+        if legacy.get("is_encrypted"):
+            if access:
+                access = encryption_helper.decrypt(access, auth_state.asset_id)
+            if refresh:
+                refresh = encryption_helper.decrypt(refresh, auth_state.asset_id)
+        # Legacy expires_in is relative to issuance, not the migration time.
+        # Refresh before use instead of granting a stale token a new lifetime.
+        token = OAuthToken(
+            access_token=access or "",
+            refresh_token=refresh,
+            token_type=legacy_token.get("token_type") or "Bearer",
+            scope=legacy_token.get("scope"),
+            expires_at=0,
+        )
+    except Exception:
+        # Decryption/validation exceptions can contain credential values.
+        raise ActionFailure(
+            "Unable to migrate legacy OAuth credentials. Run test connectivity "
+            "to authorize this asset again."
+        ) from None
+
+    migrated = dict(current)
+    migrated["oauth"] = OAuthState(token=token, client_id=asset.client_id).model_dump(
+        mode="json", exclude_none=True
+    )
+    auth_state.put_all(migrated)
 
 
 def oauth_config(asset, redirect_uri: str | None = None) -> OAuthConfig:
@@ -43,6 +98,7 @@ def oauth_config(asset, redirect_uri: str | None = None) -> OAuthConfig:
 def get_azure_oauth_client(
     asset, redirect_uri: str | None = None
 ) -> SOARAssetOAuthClient:
+    migrate_legacy_oauth_state(asset)
     return SOARAssetOAuthClient(oauth_config(asset, redirect_uri), asset.auth_state)
 
 

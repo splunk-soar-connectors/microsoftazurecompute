@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from ..helper import (
     failed_collection_result,
     make_azure_collection_request,
@@ -37,7 +39,7 @@ class ListVirtualNetworksParams(Params):
 
 
 class AddressspaceOutput(PermissiveActionOutput):
-    addressPrefixes: str = OutputField(example_values=["10.0.0.0/24"])
+    addressPrefixes: list[str] = OutputField(example_values=["10.0.0.0/24"])
 
 
 class IpconfigurationsOutput(PermissiveActionOutput):
@@ -79,10 +81,6 @@ class SubnetsOutput(PermissiveActionOutput):
     )
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["appdev"])
-
-
 class ListVirtualNetworksOutput(PermissiveActionOutput):
     etag: str = OutputField(example_values=['W/"afd6a89a-57fd-4eb4-bcbf-49ee9d377fc5"'])
     id: str = OutputField(
@@ -96,7 +94,7 @@ class ListVirtualNetworksOutput(PermissiveActionOutput):
         example_values=["myNetworkInterface1"],
     )
     properties: PropertiesOutput
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(example_values=["Microsoft.Network/virtualNetworks"])
 
 
@@ -123,10 +121,10 @@ def display_list_virtual_networks(
     summary_type=ListVirtualNetworksSummary,
     view_handler=display_list_virtual_networks,
 )
+@preserve_failure_params
 def list_virtual_networks(
     params: ListVirtualNetworksParams, soar: SOARClient, asset: Asset
 ) -> list[ListVirtualNetworksOutput]:
-
     group = (
         validate_arm_path_value(params.resource_group_name, "resource_group_name")
         if params.resource_group_name

@@ -71,6 +71,7 @@ app = App(
     product_vendor="Microsoft",
     product_name="Azure Compute",
     publisher="Splunk",
+    python_version="3.13,3.15",
     appid="39c7128b-666b-4a16-9d44-afab6a9b825d",
     fips_compliant=True,
     encrypt_cache_state=True,

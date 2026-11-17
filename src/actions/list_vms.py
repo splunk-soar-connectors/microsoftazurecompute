@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from ..helper import (
     failed_collection_result,
     make_azure_collection_request,
@@ -160,12 +162,6 @@ class ResourcesOutput(PermissiveActionOutput):
     )
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["appdev"])
-    company: str = OutputField(example_values=["Splunk"])
-    type: str = OutputField(example_values=["vm"])
-
-
 class ListVmsOutput(PermissiveActionOutput):
     id: str = OutputField(
         example_values=[
@@ -178,7 +174,7 @@ class ListVmsOutput(PermissiveActionOutput):
     )
     properties: PropertiesOutput
     resources: list[ResourcesOutput]
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(example_values=["Microsoft.Compute/virtualMachines"])
 
 
@@ -187,9 +183,7 @@ class ListVmsSummary(ActionOutput):
 
 
 @app.view_handler(template="microsoftazurecompute_list_vms.html")
-def display_list_vms(
-    outputs: list[ListVmsOutput], params: list[ListVmsParams]
-) -> dict:
+def display_list_vms(outputs: list[ListVmsOutput], params: list[ListVmsParams]) -> dict:
     return make_view_result(
         outputs, params, {"resource_group_name": "resource_group_name"}
     )
@@ -202,10 +196,10 @@ def display_list_vms(
     summary_type=ListVmsSummary,
     view_handler=display_list_vms,
 )
+@preserve_failure_params
 def list_vms(
     params: ListVmsParams, soar: SOARClient, asset: Asset
 ) -> list[ListVmsOutput]:
-
     if params.resource_group_name:
         group = validate_arm_path_value(
             params.resource_group_name, "resource_group_name"

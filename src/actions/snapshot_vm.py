@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from ..helper import make_azure_request, make_view_result, validate_arm_path_value
 from ..consts import VM_SNAPSHOT_VM_ENDPOINT
 
@@ -104,16 +106,12 @@ class SkuOutput(PermissiveActionOutput):
     tier: str = OutputField(example_values=["Standard"])
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["appdev"])
-
-
 class SnapshotVmOutput(PermissiveActionOutput):
     location: str = OutputField(example_values=["West US"])
     name: str = OutputField(example_values=["my_new_snapshot"])
     properties: PropertiesOutput
     sku: SkuOutput
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
 
 
 class SnapshotVmSummary(ActionOutput):
@@ -147,10 +145,10 @@ def display_snapshot_vm(
     summary_type=SnapshotVmSummary,
     view_handler=display_snapshot_vm,
 )
+@preserve_failure_params
 def snapshot_vm(
     params: SnapshotVmParams, soar: SOARClient, asset: Asset
 ) -> SnapshotVmOutput:
-
     snapshot_name = validate_arm_path_value(params.snapshot_name, "snapshot_name")
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     endpoint = VM_SNAPSHOT_VM_ENDPOINT.format(

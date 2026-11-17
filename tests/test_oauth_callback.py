@@ -29,6 +29,7 @@ from src.consts import MS_AZURE_CODE_GENERATION_SCOPE, MS_AZURE_RESOURCE
 class FakeAuthState:
     def __init__(self, state=None):
         self.state = dict(state or {})
+        self.backend = SimpleNamespace(load_state=lambda: {})
 
     def get_all(self, force_reload=False):
         return dict(self.state)
@@ -74,8 +75,9 @@ def make_asset():
     return SimpleNamespace(
         auth_state=FakeAuthState(),
         client_id="client-id",
-        client_secret="client-secret",
+        client_secret="client-secret",  # pragma: allowlist secret -- dummy test credential
         tenant_id="tenant-id",
+        admin_consent=False,
     )
 
 

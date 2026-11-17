@@ -16,6 +16,7 @@ from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionO
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..helper import (
     failed_table_result,
@@ -59,10 +60,10 @@ class GeneralizeVmOutput(PermissiveActionOutput):
     render_as="table",
     output_class=GeneralizeVmOutput,
 )
+@preserve_failure_params
 def generalize_vm(
     params: GeneralizeVmParams, soar: SOARClient, asset: Asset
 ) -> GeneralizeVmOutput:
-
     try:
         group = validate_arm_path_value(
             params.resource_group_name, "resource_group_name"

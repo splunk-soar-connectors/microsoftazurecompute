@@ -16,6 +16,7 @@ from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionO
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..helper import failed_table_result, make_azure_request, validate_arm_path_value
 from ..consts import VM_GET_SYSTEM_INFO_ENDPOINT
@@ -54,8 +55,8 @@ class DeleteVmOutput(PermissiveActionOutput):
     render_as="table",
     output_class=DeleteVmOutput,
 )
+@preserve_failure_params
 def delete_vm(params: DeleteVmParams, soar: SOARClient, asset: Asset) -> DeleteVmOutput:
-
     try:
         group = validate_arm_path_value(
             params.resource_group_name, "resource_group_name"

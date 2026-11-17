@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from soar_sdk.exceptions import ActionFailure
 from ..helper import (
     failed_collection_result,
@@ -114,10 +116,6 @@ class SecurityrulesOutput(PermissiveActionOutput):
     )
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["Splunk"])
-
-
 class ListSecurityGroupsOutput(PermissiveActionOutput):
     resource_group_name: str = OutputField(column_name="Resource Group Name")
     name: str = OutputField(
@@ -135,7 +133,7 @@ class ListSecurityGroupsOutput(PermissiveActionOutput):
         ],
     )
     etag: str = OutputField(example_values=['W/"bc870279-4d7a-4ced-a4b1-0311c27b5111"'])
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(
         example_values=["Microsoft.Network/applicationSecurityGroups"]
     )
@@ -156,10 +154,10 @@ class ListSecurityGroupsSummary(ActionOutput):
     summary_type=ListSecurityGroupsSummary,
     render_as="table",
 )
+@preserve_failure_params
 def list_security_groups(
     params: ListSecurityGroupsParams, soar: SOARClient, asset: Asset
 ) -> list[ListSecurityGroupsOutput]:
-
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     if params.group_type == "network":
         group_type = "networkSecurityGroups"

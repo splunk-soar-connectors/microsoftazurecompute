@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from ..helper import make_azure_request, make_view_result, validate_arm_path_value
 from ..consts import VM_GET_SYSTEM_INFO_ENDPOINT
 
@@ -168,11 +170,6 @@ class ResourcesOutput(PermissiveActionOutput):
     )
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["appdev"])
-    company: str = OutputField(example_values=["Splunk"])
-
-
 class GetSystemInfoOutput(PermissiveActionOutput):
     id: str = OutputField(
         example_values=[
@@ -185,7 +182,7 @@ class GetSystemInfoOutput(PermissiveActionOutput):
     )
     properties: PropertiesOutput
     resources: list[ResourcesOutput]
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(example_values=["Microsoft.Compute/virtualMachines"])
 
 
@@ -213,10 +210,10 @@ def display_get_system_info(
     read_only=True,
     view_handler=display_get_system_info,
 )
+@preserve_failure_params
 def get_system_info(
     params: GetSystemInfoParams, soar: SOARClient, asset: Asset
 ) -> GetSystemInfoOutput:
-
     resource_group = validate_arm_path_value(
         params.resource_group_name, "resource_group_name"
     )

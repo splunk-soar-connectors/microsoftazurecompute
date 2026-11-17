@@ -15,6 +15,7 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..helper import failed_collection_result, make_azure_collection_request
 from ..consts import VM_LIST_TAGS_ENDPOINT
@@ -71,10 +72,10 @@ def display_list_tags(outputs: list[ListTagsOutput]) -> dict:
     summary_type=ListTagsSummary,
     view_handler=display_list_tags,
 )
+@preserve_failure_params
 def list_tags(
     params: ListTagsParams, soar: SOARClient, asset: Asset
 ) -> list[ListTagsOutput]:
-
     values, page_error = make_azure_collection_request(
         asset, VM_LIST_TAGS_ENDPOINT, subscription_id=params.subscription_id
     )

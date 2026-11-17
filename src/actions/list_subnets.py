@@ -15,6 +15,7 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..helper import (
     failed_collection_result,
@@ -85,10 +86,10 @@ class ListSubnetsSummary(ActionOutput):
     summary_type=ListSubnetsSummary,
     render_as="table",
 )
+@preserve_failure_params
 def list_subnets(
     params: ListSubnetsParams, soar: SOARClient, asset: Asset
 ) -> list[ListSubnetsOutput]:
-
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     vnet = validate_arm_path_value(params.virtual_network_name, "virtual_network_name")
     endpoint = VM_LIST_SUBNETS_ENDPOINT.format(

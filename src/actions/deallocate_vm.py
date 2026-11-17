@@ -16,6 +16,7 @@ from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionO
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..helper import (
     format_vm_action_endpoint,
@@ -59,10 +60,10 @@ class DeallocateVmOutput(PermissiveActionOutput):
     render_as="table",
     output_class=DeallocateVmOutput,
 )
+@preserve_failure_params
 def deallocate_vm(
     params: DeallocateVmParams, soar: SOARClient, asset: Asset
 ) -> DeallocateVmOutput:
-
     try:
         group = validate_arm_path_value(
             params.resource_group_name, "resource_group_name"

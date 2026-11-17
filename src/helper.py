@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import json
-from contextlib import suppress
 import re
 import time
 from urllib.parse import urlparse
 
 from soar_sdk.action_results import ActionOutput, ActionResult
 from soar_sdk.auth import create_oauth_client
+from soar_sdk.auth.client import OAuthClientError
 from soar_sdk.params import Params
 from soar_sdk.exceptions import ActionFailure
 
-from .auth import get_access_token, is_client_credentials, oauth_config
+from .auth import (
+    get_access_token,
+    is_client_credentials,
+    migrate_legacy_oauth_state,
+    oauth_config,
+)
 from .consts import (
     MS_AZURE_ERR_MSG,
-    MS_AZURE_INVALID_TOKEN_MSGS,
+    MS_AZURE_INVALID_JSON,
     MS_AZURE_SERVER_ERR_MSG,
     MS_BASE_URL,
     VM_ACTION_ENDPOINT,
@@ -45,6 +50,22 @@ def validate_arm_path_value(value: str, field_name: str) -> str:
     if not is_safe_arm_path_value(value):
         raise ValueError(f"Please provide a valid {field_name} path value")
     return value
+
+
+def parse_resource_tags(value: str | None) -> dict:
+    """Parse tags, preserving the legacy dictionary-update input contract."""
+    tags = {}
+    if value:
+        try:
+            tags.update(json.loads(value))
+        except (TypeError, ValueError) as exc:
+            raise ActionFailure(
+                MS_AZURE_INVALID_JSON.format(
+                    err_msg="Tags must be a JSON object or an array of key/value pairs",
+                    param="tags",
+                )
+            ) from exc
+    return tags
 
 
 def format_vm_action_endpoint(
@@ -82,18 +103,14 @@ def _send_request(
     verify: bool = True,
     timeout: float = 30.0,
 ):
-    import httpx  # noqa: PLC0415
+    import httpx
 
     request_headers = {"Accept": "application/json"}
     if json_body is not None or data is not None:
         request_headers["Content-Type"] = "application/json"
     for header_name, header_value in (headers or {}).items():
         existing_name = next(
-            (
-                name
-                for name in request_headers
-                if name.lower() == header_name.lower()
-            ),
+            (name for name in request_headers if name.lower() == header_name.lower()),
             None,
         )
         if existing_name is not None:
@@ -107,7 +124,9 @@ def _send_request(
             if name.lower() != "authorization"
         }
         outgoing_headers["Authorization"] = f"Bearer {token}"
-        with httpx.Client(timeout=timeout, verify=verify, follow_redirects=True) as client:
+        with httpx.Client(
+            timeout=timeout, verify=verify, follow_redirects=True
+        ) as client:
             return client.request(
                 method,
                 url,
@@ -119,6 +138,7 @@ def _send_request(
 
     try:
         if not is_client_credentials(asset):
+            migrate_legacy_oauth_state(asset)
             with create_oauth_client(
                 asset,
                 client_id=asset.client_id,
@@ -138,9 +158,9 @@ def _send_request(
                 )
 
         response = send_with_token(get_access_token(asset))
-        if response.status_code == 401 or any(
-            phrase in response.text for phrase in MS_AZURE_INVALID_TOKEN_MSGS
-        ):
+        # Successful command output can contain token-error text. Only an
+        # authentication failure justifies renewing and replaying the request.
+        if response.status_code == 401:
             response = send_with_token(get_access_token(asset, force_renew=True))
         return response
     except httpx.RequestError as exc:
@@ -204,9 +224,7 @@ def make_azure_collection_request(
     subscription_id: str | None = None,
 ) -> tuple[list, str | None]:
     """Fetch every page of an ARM collection, retaining items on later-page errors."""
-    response = make_azure_request(
-        asset, endpoint, subscription_id=subscription_id
-    )
+    response = make_azure_request(asset, endpoint, subscription_id=subscription_id)
     if not isinstance(response, dict):
         raise ActionFailure("Azure returned an invalid collection response")
 
@@ -246,6 +264,38 @@ def make_absolute_request(asset, url: str, *, method: str = "GET"):
     return _response_data(response)
 
 
+def make_vm_start_request(
+    asset, endpoint: str, *, subscription_id=None, timeout_seconds=300
+):
+    """Submit VM start once and wait for Azure's operation-completion signal."""
+    subscription = resolve_subscription(asset, subscription_id)
+    url = f"{MS_BASE_URL.format(subscriptionId=subscription)}{endpoint}"
+    response = _send_request(asset, url, method="POST")
+    if response.status_code != 202:
+        payload = _response_data(response)
+        state = payload.get("status") if isinstance(payload, dict) else None
+        if isinstance(state, str) and state.casefold() in {
+            "failed",
+            "canceled",
+            "cancelled",
+        }:
+            raise AsyncOperationError(
+                f"Azure VM start operation {state}: {json.dumps(payload.get('error', {}))}",
+                None,
+                None,
+                state,
+                payload,
+            )
+        return payload, None
+    return _wait_for_azure_operation(
+        asset,
+        response,
+        timeout_seconds=timeout_seconds,
+        fetch_results=False,
+        operation_name="VM start",
+    )
+
+
 def make_async_request(
     asset,
     endpoint: str,
@@ -257,32 +307,184 @@ def make_async_request(
     subscription = resolve_subscription(asset, subscription_id)
     url = f"{MS_BASE_URL.format(subscriptionId=subscription)}{endpoint}"
     response = _send_request(asset, url, method=method, json_body=json_body)
-    if response.status_code == 202:
-        operation_url = response.headers.get("Azure-AsyncOperation")
-        location_url = response.headers.get("Location")
-        if not operation_url or not location_url:
-            raise ActionFailure("Azure did not return asynchronous operation URLs")
-        if not is_allowed_arm_url(operation_url) or not is_allowed_arm_url(
-            location_url
+    if response.status_code != 202:
+        payload = _response_data(response)
+        state = payload.get("status") if isinstance(payload, dict) else None
+        if isinstance(state, str) and state.casefold() in {
+            "failed",
+            "canceled",
+            "cancelled",
+        }:
+            raise AsyncOperationError(
+                f"Azure command operation {state}: {json.dumps(payload.get('error', {}))}",
+                None,
+                None,
+                state,
+                payload,
+            )
+        return payload, None
+
+    return _wait_for_azure_operation(asset, response)
+
+
+class AsyncOperationError(ActionFailure):
+    """An accepted Azure operation whose final outcome could not be returned."""
+
+    def __init__(
+        self,
+        message: str,
+        operation_url: str | None,
+        results_url: str | None,
+        state: str,
+        response: dict,
+    ):
+        super().__init__(message)
+        self.operation_url = operation_url
+        self.results_url = results_url
+        self.operation_status = state
+        self.response = response
+
+
+def _operation_poll_delay(response) -> int:
+    try:
+        delay = int(response.headers.get("Retry-After", "3"))
+    except (TypeError, ValueError):
+        return 3
+    return delay if delay > 0 else 3
+
+
+def _wait_for_azure_operation(
+    asset,
+    response,
+    *,
+    timeout_seconds: int = 60,
+    fetch_results: bool = True,
+    operation_name: str = "Command",
+):
+    """Poll an accepted operation without repeating its submission."""
+    operation_url = response.headers.get("Azure-AsyncOperation")
+    results_url = response.headers.get("Location")
+    unsafe_url = any(
+        value and not is_allowed_arm_url(value)
+        for value in (operation_url, results_url)
+    )
+    operation_url = operation_url if is_allowed_arm_url(operation_url) else None
+    results_url = results_url if is_allowed_arm_url(results_url) else None
+    state = "InProgress"
+    last_response = {}
+
+    def fail(message):
+        return AsyncOperationError(
+            message, operation_url, results_url, state, last_response
+        )
+
+    if unsafe_url or not (operation_url or results_url):
+        raise fail(
+            f"{operation_name} submitted, but Azure returned missing or invalid tracking URLs; completion not confirmed"
+        )
+
+    deadline = time.monotonic() + timeout_seconds
+    delay = _operation_poll_delay(response)
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise fail(
+                f"{operation_name} submitted; completion not confirmed within the {timeout_seconds}-second polling window. Inspect the operation later; do not resubmit the request"
+            )
+        time.sleep(min(delay, remaining))
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise fail(
+                f"{operation_name} submitted; completion not confirmed within the {timeout_seconds}-second polling window. Inspect the operation later; do not resubmit the request"
+            )
+        try:
+            response = _send_request(
+                asset, operation_url or results_url, timeout=min(30.0, remaining)
+            )
+            payload = _response_data(response)
+        except (ActionFailure, OAuthClientError, ValueError) as exc:
+            raise fail(
+                f"{operation_name} submitted; unable to retrieve operation status; completion not confirmed: {exc}"
+            ) from exc
+
+        if (
+            fetch_results
+            and not operation_url
+            and response.status_code == 200
+            and isinstance(payload, list)
         ):
-            raise ActionFailure("Azure returned an invalid asynchronous operation URL")
+            return payload, results_url
+        if not isinstance(payload, dict):
+            raise fail(
+                f"{operation_name} submitted; Azure returned invalid operation status; completion not confirmed"
+            )
+        last_response = payload
+        reported_state = payload.get("status")
+        if isinstance(reported_state, str) and reported_state:
+            state = reported_state
+        elif operation_url:
+            raise fail(
+                f"{operation_name} submitted; Azure omitted operation status; completion not confirmed"
+            )
+        else:
+            # Without Azure-AsyncOperation, Location's HTTP status tracks completion.
+            state = "InProgress" if response.status_code == 202 else "Succeeded"
 
-        state = "InProgress"
-        attempts = 0
-        while attempts < 20 or state == "InProgress":
-            time.sleep(3)
-            status_data = make_absolute_request(asset, operation_url)
-            state = status_data.get("status") if isinstance(status_data, dict) else None
-            attempts += 1
-        return make_absolute_request(asset, location_url), location_url
-
-    if response.status_code != 200:
-        return _response_data(response), None
-    return _response_data(response), None
+        if state.casefold() in {"failed", "canceled", "cancelled"}:
+            error = payload.get("error")
+            detail = json.dumps(error) if error else "No Azure error details returned"
+            raise fail(f"Azure {operation_name.lower()} operation {state}: {detail}")
+        if state.casefold() == "succeeded":
+            if not fetch_results:
+                return payload, operation_url or results_url
+            if not operation_url:
+                return payload, results_url
+            if not results_url:
+                raise fail(
+                    f"{operation_name} succeeded, but Azure did not return a results URL"
+                )
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise fail(
+                    f"{operation_name} succeeded; the polling window ended before results could be retrieved"
+                )
+            try:
+                result_response = _send_request(
+                    asset, results_url, timeout=min(30.0, remaining)
+                )
+                if result_response.status_code == 202:
+                    raise fail(
+                        f"{operation_name} succeeded, but results are not yet available; retrieve them later"
+                    )
+                result = _response_data(result_response)
+                if not isinstance(result, dict | list):
+                    raise fail(
+                        f"{operation_name} succeeded, but Azure returned an invalid results response"
+                    )
+                result_state = (
+                    result.get("status") if isinstance(result, dict) else None
+                )
+                if isinstance(result_state, str) and result_state.casefold() in {
+                    "failed",
+                    "canceled",
+                    "cancelled",
+                }:
+                    state = result_state
+                    last_response = result
+                    raise fail(
+                        f"Azure {operation_name.lower()} operation {state}: {json.dumps(result.get('error', {}))}"
+                    )
+                return result, results_url
+            except AsyncOperationError:
+                raise
+            except (ActionFailure, OAuthClientError, ValueError) as exc:
+                raise fail(
+                    f"{operation_name} succeeded, but retrieving results failed: {exc}"
+                ) from exc
+        delay = _operation_poll_delay(response)
 
 
 def parse_command_list(value: str | None, field_name: str, *, allow_plain_text: bool):
-
     if not value:
         return value
     try:
@@ -295,16 +497,16 @@ def parse_command_list(value: str | None, field_name: str, *, allow_plain_text: 
 
 
 def normalize_command_results(response, results_url: str | None) -> dict:
+    """Keep the documented operation object and string messages intact.
 
+    Bare status arrays use the same properties.output envelope as the vendor's
+    2017-03-30 sample, giving both command actions one predictable result type.
+    """
     if isinstance(response, list):
-        results = list(response)
-        for result in results:
-            if result.get("message"):
-                with suppress(TypeError, ValueError):
-                    result["message"] = json.loads(result["message"])
-    else:
-        results = response
-    return {"results_url": results_url, "results": results}
+        response = {"properties": {"output": response}}
+    if not isinstance(response, dict):
+        raise ActionFailure("Azure returned an invalid command result response")
+    return {"results_url": results_url, "results": response}
 
 
 def vm_mutation_output_fields(

@@ -15,11 +15,16 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
-from soar_sdk.exceptions import ActionFailure
-from ..helper import make_azure_request, make_view_result, validate_arm_path_value
-import json
-from ..consts import MS_AZURE_INVALID_JSON, VM_SECURITY_GROUP_ENDPOINT
+from ..resource_tags import ResourceTagsOutput
+from ..helper import (
+    make_azure_request,
+    make_view_result,
+    parse_resource_tags,
+    validate_arm_path_value,
+)
+from ..consts import VM_SECURITY_GROUP_ENDPOINT
 
 
 class AddApplicationGroupParams(Params):
@@ -77,10 +82,6 @@ class PropertiesOutput(PermissiveActionOutput):
     provisioningState: str = OutputField(example_values=["Succeeded"])
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["Splunk"])
-
-
 class AddApplicationGroupOutput(PermissiveActionOutput):
     etag: str = OutputField(example_values=['W/"b6eab29d-32f4-48d2-80e1-06f8dfb3616a"'])
     id: str = OutputField(
@@ -93,7 +94,7 @@ class AddApplicationGroupOutput(PermissiveActionOutput):
         cef_types=["vm management group name"], example_values=["example_name"]
     )
     properties: PropertiesOutput
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(
         example_values=["Microsoft.Network/applicationSecurityGroups"]
     )
@@ -127,10 +128,10 @@ def display_add_application_security_group(
     summary_type=AddApplicationSecurityGroupSummary,
     view_handler=display_add_application_security_group,
 )
+@preserve_failure_params
 def add_application_security_group(
     params: AddApplicationGroupParams, soar: SOARClient, asset: Asset
 ) -> AddApplicationGroupOutput:
-
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     group_name = validate_arm_path_value(params.group_name, "group_name")
     endpoint = VM_SECURITY_GROUP_ENDPOINT.format(
@@ -138,14 +139,7 @@ def add_application_security_group(
         groupType="applicationSecurityGroups",
         groupName=f"/{group_name}",
     )
-    body = {"location": params.location, "tags": {}}
-    if params.tags:
-        try:
-            body["tags"].update(json.loads(params.tags))
-        except json.JSONDecodeError as exc:
-            raise ActionFailure(
-                MS_AZURE_INVALID_JSON.format(err_msg=str(exc), param="tags")
-            ) from exc
+    body = {"location": params.location, "tags": parse_resource_tags(params.tags)}
     response = make_azure_request(
         asset,
         endpoint,

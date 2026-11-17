@@ -18,9 +18,15 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..command_output import CommandResponseOutput
 from soar_sdk.exceptions import ActionFailure
-from ..helper import make_absolute_request, normalize_command_results, resolve_subscription
+from ..helper import (
+    make_absolute_request,
+    normalize_command_results,
+    resolve_subscription,
+)
 
 
 class GetResultsParams(Params):
@@ -34,17 +40,6 @@ class GetResultsParams(Params):
     )
 
 
-class GetResultsResultOutput(PermissiveActionOutput):
-    code: str = OutputField(
-        example_values=[
-            "ComponentStatus/StdOut/succeeded",
-            "ComponentStatus/StdErr/succeeded",
-        ]
-    )
-    level: str = OutputField(example_values=["Info"])
-    message: str = OutputField()
-
-
 class GetResultsOutput(PermissiveActionOutput):
     results_url: str | None = OutputField(
         column_name="Results URL",
@@ -53,8 +48,7 @@ class GetResultsOutput(PermissiveActionOutput):
             "https://management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
         ],
     )
-    displayStatus: str = OutputField(example_values=["Provisioning succeeded"])
-    results: list[GetResultsResultOutput] | None = OutputField()
+    results: CommandResponseOutput = OutputField()
 
 
 class GetResultsSummary(ActionOutput):
@@ -70,10 +64,10 @@ class GetResultsSummary(ActionOutput):
     render_as="table",
     output_class=GetResultsOutput,
 )
+@preserve_failure_params
 def get_results(
     params: GetResultsParams, soar: SOARClient, asset: Asset
 ) -> GetResultsOutput:
-
     parsed = urlparse(params.results_url)
     subscription = resolve_subscription(asset, params.subscription_id)
     normalized_path = normpath(unquote(parsed.path))

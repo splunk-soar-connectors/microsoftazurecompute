@@ -20,6 +20,7 @@ from soar_sdk.action_results import (
 )
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from soar_sdk.exceptions import ActionFailure
 from ..helper import make_azure_request, validate_arm_path_value
@@ -79,10 +80,10 @@ class CreateTagSummary(ActionOutput):
     render_as="table",
     output_class=CreateTagOutput,
 )
+@preserve_failure_params
 def create_tag(
     params: CreateTagParams, soar: SOARClient, asset: Asset
 ) -> CreateTagOutput:
-
     tag_name = validate_arm_path_value(params.tag_name, "tag_name")
     tag_value = params.tag_value
     if tag_value:

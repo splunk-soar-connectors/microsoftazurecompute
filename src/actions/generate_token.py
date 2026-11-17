@@ -15,6 +15,7 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput
 from soar_sdk.params import Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..auth import get_access_token
 
@@ -31,10 +32,10 @@ class GenerateTokenOutput(ActionOutput):
     output_class=GenerateTokenOutput,
     verbose="This action generated a new token whenever any action fails because of an invalid or expired token.",
 )
+@preserve_failure_params
 def generate_token(
     params: Params, soar: SOARClient, asset: Asset
 ) -> GenerateTokenOutput:
-
     get_access_token(asset, force_renew=True)
     soar.set_message("Token generated")
     return GenerateTokenOutput()

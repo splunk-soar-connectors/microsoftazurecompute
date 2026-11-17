@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import ipaddress
+
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..helper import make_azure_request, validate_arm_path_value
 from ..consts import VM_CHECK_IP_AVAIL
@@ -65,17 +68,27 @@ class GetIpAvailabilitySummary(ActionOutput):
     summary_type=GetIpAvailabilitySummary,
     render_as="table",
 )
+@preserve_failure_params
 def check_address_availability(
     params: GetIpAvailabilityParams, soar: SOARClient, asset: Asset
 ) -> list[GetIpAvailabilityOutput]:
+    try:
+        ipaddress.ip_address(params.ip_address)
+    except ValueError:
+        return (
+            False,
+            "Please provide a valid IPv4 or IPv6 address in ip_address",
+            params.model_dump(by_alias=True),
+        )
 
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     vnet = validate_arm_path_value(params.virtual_network_name, "virtual_network_name")
-    endpoint = VM_CHECK_IP_AVAIL.format(
-        resourceGroup=group, virtualNetwork=vnet, ip=params.ip_address
-    )
+    endpoint = VM_CHECK_IP_AVAIL.format(resourceGroup=group, virtualNetwork=vnet)
     response = make_azure_request(
-        asset, endpoint, subscription_id=params.subscription_id
+        asset,
+        endpoint,
+        subscription_id=params.subscription_id,
+        params={"ipAddress": params.ip_address, "api-version": "2018-11-01"},
     )
     values = response.get("availableIPAddresses", [])
     soar.set_summary(

@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from ..helper import (
     failed_collection_result,
     make_azure_collection_request,
@@ -65,11 +67,6 @@ class SkuOutput(PermissiveActionOutput):
     tier: str = OutputField(example_values=["Standard"])
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["appdev"])
-    type: str = OutputField(example_values=["snapshot"])
-
-
 class ListSnapshotsOutput(PermissiveActionOutput):
     id: str = OutputField(
         example_values=[
@@ -82,7 +79,7 @@ class ListSnapshotsOutput(PermissiveActionOutput):
     )
     properties: PropertiesOutput
     sku: SkuOutput
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(example_values=["Microsoft.Compute/snapshots"])
 
 
@@ -106,10 +103,10 @@ def display_list_snapshots(
     summary_type=ListSnapshotsSummary,
     view_handler=display_list_snapshots,
 )
+@preserve_failure_params
 def list_snapshots(
     params: ListSnapshotsParams, soar: SOARClient, asset: Asset
 ) -> list[ListSnapshotsOutput]:
-
     group = (
         validate_arm_path_value(params.resource_group_name, "resource_group_name")
         if params.resource_group_name

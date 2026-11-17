@@ -15,7 +15,9 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
+from ..resource_tags import ResourceTagsOutput
 from ..helper import failed_collection_result, make_azure_collection_request
 from ..consts import VM_RESOURCE_GROUP_ENDPOINT
 
@@ -29,13 +31,6 @@ class ListResourceGroupsParams(Params):
 class PropertiesOutput(PermissiveActionOutput):
     provisioningState: str = OutputField(
         column_name="Provisioning State", example_values=["Succeeded"]
-    )
-
-
-class TagsOutput(PermissiveActionOutput):
-    company: str = OutputField(example_values=["mycomp"])
-    keyname____keyvalue__: str = OutputField(
-        example_values=["abcd"], alias='{"keyname": "keyvalue"}'
     )
 
 
@@ -53,7 +48,7 @@ class ListResourceGroupsOutput(PermissiveActionOutput):
             "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/DefaultResourceGroup-EUS"
         ],
     )
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
 
 
 class ListResourceGroupsSummary(ActionOutput):
@@ -67,10 +62,10 @@ class ListResourceGroupsSummary(ActionOutput):
     summary_type=ListResourceGroupsSummary,
     render_as="table",
 )
+@preserve_failure_params
 def list_resource_groups(
     params: ListResourceGroupsParams, soar: SOARClient, asset: Asset
 ) -> list[ListResourceGroupsOutput]:
-
     values, page_error = make_azure_collection_request(
         asset, VM_RESOURCE_GROUP_ENDPOINT, subscription_id=params.subscription_id
     )

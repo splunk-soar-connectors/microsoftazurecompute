@@ -20,6 +20,7 @@ from soar_sdk.action_results import MakeRequestOutput
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import MakeRequestParams, Param
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
 from ..consts import MS_BASE_URL
 from ..helper import _send_request, resolve_subscription
@@ -131,6 +132,7 @@ def _get_body(
 
 
 @app.make_request()
+@preserve_failure_params
 def make_request(
     params: AzureComputeMakeRequestParams, asset: Asset
 ) -> MakeRequestOutput:

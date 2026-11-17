@@ -15,11 +15,17 @@ from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
+from ..action_errors import preserve_failure_params
 from ..app import Asset, app
-from soar_sdk.exceptions import ActionFailure
-from ..helper import make_azure_request, make_view_result, validate_arm_path_value
+from ..resource_tags import ResourceTagsOutput
+from ..helper import (
+    make_azure_request,
+    make_view_result,
+    parse_resource_tags,
+    validate_arm_path_value,
+)
 import json
-from ..consts import MS_AZURE_INVALID_JSON, VM_SECURITY_GROUP_ENDPOINT
+from ..consts import VM_SECURITY_GROUP_ENDPOINT
 
 
 class AddNetworkGroupParams(Params):
@@ -126,10 +132,6 @@ class DefaultsecurityrulesOutput(PermissiveActionOutput):
     )
 
 
-class TagsOutput(PermissiveActionOutput):
-    author: str = OutputField(example_values=["test-user"])
-
-
 class AddNetworkGroupOutput(PermissiveActionOutput):
     etag: str = OutputField(
         example_values=[
@@ -145,7 +147,7 @@ class AddNetworkGroupOutput(PermissiveActionOutput):
     location: str = OutputField(example_values=["westus2"])
     name: str = OutputField(example_values=["netwGroup1"])
     properties: "PropertiesOutput"
-    tags: TagsOutput
+    tags: ResourceTagsOutput | None = None
     type: str = OutputField(example_values=["Microsoft.Network/networkSecurityGroups"])
 
 
@@ -185,10 +187,10 @@ def display_add_network_security_group(
     summary_type=AddNetworkSecurityGroupSummary,
     view_handler=display_add_network_security_group,
 )
+@preserve_failure_params
 def add_network_security_group(
     params: AddNetworkGroupParams, soar: SOARClient, asset: Asset
 ) -> AddNetworkGroupOutput:
-
     group = validate_arm_path_value(params.resource_group_name, "resource_group_name")
     group_name = validate_arm_path_value(params.group_name, "group_name")
     endpoint = VM_SECURITY_GROUP_ENDPOINT.format(
@@ -196,14 +198,11 @@ def add_network_security_group(
         groupType="networkSecurityGroups",
         groupName=f"/{group_name}",
     )
-    body = {"location": params.location, "properties": {}, "tags": {}}
-    if params.tags:
-        try:
-            body["tags"].update(json.loads(params.tags))
-        except json.JSONDecodeError as exc:
-            raise ActionFailure(
-                MS_AZURE_INVALID_JSON.format(err_msg=str(exc), param="tags")
-            ) from exc
+    body = {
+        "location": params.location,
+        "properties": {},
+        "tags": parse_resource_tags(params.tags),
+    }
     for source, target in (
         (params.default_security_rules, "defaultSecurityRules"),
         (params.provisioning_state, "provisioningState"),

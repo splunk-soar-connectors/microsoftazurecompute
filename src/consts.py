@@ -40,7 +40,7 @@ subnets?api-version=2018-11-01"
 )
 VM_CHECK_IP_AVAIL = (
     "/resourceGroups/{resourceGroup}/providers/Microsoft.Network/virtualNetworks/{virtualNetwork}/\
-CheckIPAddressAvailability?ipAddress={ip}&api-version=2018-11-01"
+CheckIPAddressAvailability"
 )
 VM_RUN_COMMAND_ENDPOINT = (
     "/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/\
@@ -54,7 +54,9 @@ MS_PHANTOM_ASSET_INFO_URL = "{url}rest/asset/{asset_id}"
 MS_AZURE_CONFIG_TENANT = "tenant_id"
 MS_AZURE_CONFIG_SUBSCRIPTION = "subscription_id"
 MS_AZURE_CONFIG_CLIENT_ID = "client_id"
-MS_AZURE_CONFIG_CLIENT_SECRET = "client_secret"  # pragma: allowlist secret  # noqa: S105
+MS_AZURE_CONFIG_CLIENT_SECRET = (
+    "client_secret"  # pragma: allowlist secret  # noqa: S105
+)
 MS_AZURE_CONFIG_ADMIN_ACCESS = "admin_access"
 MS_AZURE_CONFIG_ADMIN_CONSENT = "admin_consent"
 MS_AZURE_TOKEN_STRING = "token"  # noqa: S105
