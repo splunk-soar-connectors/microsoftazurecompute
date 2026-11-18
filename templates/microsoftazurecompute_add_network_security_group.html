@@ -1,17 +1,7 @@
 {% extends 'widgets/widget_template.html' %}
-{% load custom_template %}
-{% block custom_title_prop %}
-  {% if title_logo %}
-    style="background-size: auto 60%; background-position: 50%;
-    background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
-  {% endif %}
-{% endblock %}
-{% block title1 %}{{ title1 }}{% endblock %}
-{% block title2 %}{{ title2 }}{% endblock %}
-{% block custom_tools %}{% endblock %}
 {% block widget_content %}
   <!-- Main Start Block -->
-  <!-- File: microsoftazurecompute_get_system_info.html
+  <!-- File: microsoftazurecompute_add_network_security_group.html
   Copyright (c) 2019-2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -94,7 +84,7 @@ and limitations under the License.
               <td>Resource Group Name</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['vm management resource group'], 'value':'{{ result.param.resource_group_name|escapejs }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['vm management resource group'], 'value':{{ result.param.resource_group_name|to_json|safe }} }], 0, {{ container }}, null, false);">
                   {{ result.param.resource_group_name }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -102,21 +92,59 @@ and limitations under the License.
               </td>
             </tr>
             <tr>
-              <td>VM Name</td>
+              <td>Group Name</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['vm management virtual machine'], 'value':'{{ result.param.vm_name|escapejs }}' }], 0, {{ container.id }}, null, false);">
-                  {{ result.param.vm_name }}
+                   onclick="context_menu(this, [{'contains': ['vm management group name'], 'value':{{ result.param.group_name|to_json|safe }} }], 0, {{ container }}, null, false);">
+                  {{ result.param.group_name }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                 </a>
               </td>
             </tr>
+            <tr>
+              <td>Location</td>
+              <td>{{ result.param.location }}</td>
+            </tr>
+            {% if result.param.tags %}
+              <tr>
+                <td>Tags</td>
+                <td>{{ result.param.tags }}</td>
+              </tr>
+            {% endif %}
+            {% if result.param.default_security_rules %}
+              <tr>
+                <td>Default Security Rules</td>
+                <td>{{ result.param.default_security_rules }}</td>
+              </tr>
+            {% endif %}
+            {% if result.param.provisioning_state %}
+              <tr>
+                <td>Provisioning State</td>
+                <td>{{ result.param.provisioning_state }}</td>
+              </tr>
+            {% endif %}
+            {% if result.param.resource_guid %}
+              <tr>
+                <td>Resource GUID</td>
+                <td>{{ result.param.resource_guid }}</td>
+              </tr>
+            {% endif %}
+            {% if result.param.security_rules %}
+              <tr>
+                <td>Security Rules</td>
+                <td>{{ result.param.security_rules }}</td>
+              </tr>
+            {% endif %}
           </table>
         </div>
         {% for data in result.data %}
           <h3 class="wf-h4-style">{{ data.name }}</h3>
           <table class="wf-table-vertical">
+            <tr>
+              <th>Etag</th>
+              <td>{{ data.etag }}</td>
+            </tr>
             <tr>
               <th>Location</th>
               <td>{{ data.location }}</td>
@@ -130,81 +158,12 @@ and limitations under the License.
               <td>{{ data.id }}</td>
             </tr>
             <tr>
-              <th>VM ID</th>
-              <td>{{ data.properties.vmId }}</td>
-            </tr>
-          </table>
-          <br>
-          <table class="wf-table-vertical">
-            <tr>
-              <th colspan="2">OS Profile</th>
+              <th>Provisioning State</th>
+              <td>{{ data.properties.provisioningState }}</td>
             </tr>
             <tr>
-              <th>Admin Username</th>
-              <td>
-                <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['user name'], 'value':'{{ data.properties.osProfile.adminUsername|escapejs }}' }], 0, {{ container.id }}, null, false);">
-                  {{ data.properties.osProfile.adminUsername }}
-                  &nbsp;
-                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <th>Computer Name</th>
-              <td>
-                <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['vm management virtual machine'], 'value':'{{ data.properties.osProfile.computerName|escapejs }}' }], 0, {{ container.id }}, null, false);">
-                  {{ data.properties.osProfile.computerName }}
-                  &nbsp;
-                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-              </td>
-            </tr>
-          </table>
-          <br>
-          <table class="wf-table-vertical">
-            <tr>
-              <th>Network Profile Interfaces</th>
-            </tr>
-            {% for i in data.properties.networkProfile.networkInterfaces %}
-              <tr>
-                <td>{{ i.id }}</td>
-              </tr>
-            {% endfor %}
-          </table>
-          <br>
-          <table class="wf-table-vertical">
-            <tr>
-              <th colspan="2">Storage Profile</th>
-            </tr>
-            <tr>
-              <th>Image Reference Sku</th>
-              <td>{{ data.properties.storageProfile.imageReference.sku }}</td>
-            </tr>
-            <tr>
-              <th>Image Reference Publisher</th>
-              <td>{{ data.properties.storageProfile.imageReference.publisher }}</td>
-            </tr>
-            <tr>
-              <th>Image Reference Version</th>
-              <td>{{ data.properties.storageProfile.imageReference.version }}</td>
-            </tr>
-            <tr>
-              <th>Image Reference Offer</th>
-              <td>{{ data.properties.storageProfile.imageReference.offer }}</td>
-            </tr>
-            <tr>
-              <th>OS Disk Name</th>
-              <td>{{ data.properties.storageProfile.osDisk.name }}</td>
-            </tr>
-            <tr>
-              <th>OS Disk Size (GB)</th>
-              <td>{{ data.properties.storageProfile.osDisk.diskSizeGB }}</td>
-            </tr>
-            <tr>
-              <th>OS Disk Type</th>
-              <td>{{ data.properties.storageProfile.osDisk.osType }}</td>
+              <th>Resource GUID</th>
+              <td>{{ data.properties.resourceGuid }}</td>
             </tr>
           </table>
           {% if data.tags %}
@@ -214,7 +173,7 @@ and limitations under the License.
                 <th>Tag Name</th>
                 <th>Tag Value</th>
               </tr>
-              {% for key, val in data.tags.items %}
+              {% for key, val in data.tags.items() %}
                 <tr>
                   <td>{{ key }}</td>
                   <td>{{ val }}</td>
@@ -222,6 +181,28 @@ and limitations under the License.
               {% endfor %}
             </table>
           {% endif %}
+          {% if data.properties.defaultSecurityRules %}<h3 class="wf-h4-style">Default Security Rules:</h3>{% endif %}
+          {% for rule in data.properties.defaultSecurityRules %}
+            <br>
+            <table class="wf-table-vertical">
+              <tr>
+                <th>Name</th>
+                <td>{{ rule.name }}</td>
+              </tr>
+              <tr>
+                <th>Etag</th>
+                <td>{{ rule.etag }}</td>
+              </tr>
+              <tr>
+                <th>Type</th>
+                <td>{{ rule.type }}</td>
+              </tr>
+              <tr>
+                <th>ID</th>
+                <td>{{ rule.id }}</td>
+              </tr>
+            </table>
+          {% endfor %}
           <br>
         {% endfor %}
         <!-- loop for each data end -->
@@ -234,4 +215,3 @@ and limitations under the License.
   </div>
   <!-- Main Div -->
 {% endblock %}
-<!-- Main Start Block -->

@@ -1,1 +1,12 @@
 **Unreleased**
+
+* Add the SDK `make_request` action for custom ARM requests under the asset's configured subscription.
+* `get ip availability` now validates IPv4 and IPv6 addresses and rejects invalid address input before making the request.
+* `start vm` can optionally wait for Azure to finish starting the VM. Set `wait_for_completion` to `true`; the wait is bounded by `wait_timeout_seconds` (default 300 seconds). The default remains submission-only. A timeout or polling error does not cancel the Azure operation; inspect the returned operation details before retrying. Completion does not mean the guest OS or its applications are ready.
+* `run command` polling now stops at terminal Azure states and is bounded to 60 seconds. A timeout does not cancel the command or mean it failed; inspect the returned tracking details before retrying. If execution succeeds but result retrieval fails, the action reports that distinction and retains available tracking information.
+* Existing delegated OAuth authorization may need to be renewed if its legacy refresh token is missing, expired, revoked, or unreadable. Reauthorization requires the Microsoft Entra app registration's Web redirect URI to use this app's SOAR webhook callback URL; the legacy `/result` redirect is no longer used.
+* `create_tag` with a value now returns its response in `action_result.data` instead of `action_result.extra_data`. Playbooks reading the legacy `extra_data` path need to be updated. If tag-name creation succeeds but adding the value fails, the action reports failure and retains the created tag details.
+* Collection actions now follow Azure pagination. If a later page fails, the action reports failure while retaining rows already collected.
+* `run_command` and `get_results` output schema change: `results` is now an object. Bare-list responses are placed under `results.properties.output`; Azure operation objects retain their response shape. Messages remain strings as returned by Azure, including JSON text. Update playbooks that read bare-list messages from `action_result.data.*.results.*.message` to `action_result.data.*.results.properties.output.*.message`. For newer Azure responses, message paths remain under `results.value.*.message`.
+* `list_virtual_networks` models `addressPrefixes` as a list. Use `action_result.data.*.properties.addressSpace.addressPrefixes.*` to access individual prefixes.
+* Tag inputs now accept user-defined keys instead of requiring the example-specific tag names shown in generated metadata.
